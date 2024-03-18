@@ -1,0 +1,233 @@
+#if UNITY_EDITOR
+using UnityEditor;
+using UnityEngine;
+
+[ExecuteInEditMode]
+public class CollidersDebugGizmos : MonoBehaviour
+{
+    private enum ColliderType
+    {
+        BOX, SPHERE, CAPSULE, OTHER
+    }
+    private struct ColliderItem
+    {
+        public ColliderType Type;
+        public Collider Collider;
+
+        public ColliderItem(ColliderType type, Collider collider)
+        {
+            Type = type;
+            Collider = collider;
+        }
+    }
+
+    private ColliderItem[] _colliders;
+    private readonly Color GIZMOS_COLOR = Color.red;
+
+    private void Update()
+    {
+        GetColliders();
+    }
+
+    private void GetColliders()
+    {
+        Collider[] colliders = gameObject.GetComponents<Collider>();
+        _colliders = new ColliderItem[colliders.Length];
+
+        for (int i = 0; i < colliders.Length; i++)
+        {
+            Collider col = colliders[i];
+            ColliderType colType = ColliderType.OTHER;
+
+            if (col.GetType() == typeof(BoxCollider))
+            {
+                colType = ColliderType.BOX;
+            }
+            else if (col.GetType() == typeof(SphereCollider))
+            {
+                colType = ColliderType.SPHERE;
+            }
+            else if (col.GetType() == typeof(CapsuleCollider))
+            {
+                colType = ColliderType.CAPSULE;
+            }
+
+            _colliders[i] = new ColliderItem(colType, col);
+        }
+    }
+
+    private void OnDrawGizmos()
+    {
+        if (_colliders == null || _colliders.Length == 0)
+        {
+            return;
+        }
+
+        Gizmos.color = GIZMOS_COLOR;
+        Handles.color = GIZMOS_COLOR;
+
+        foreach (ColliderItem item in _colliders)
+        {
+            if (!item.Collider.enabled)
+            {
+                continue;
+            }
+
+            switch (item.Type)
+            {
+                case ColliderType.BOX:
+                    DrawBoxGizmo(item.Collider as BoxCollider);
+                    break;
+                case ColliderType.SPHERE:
+                    DrawSphereGizmo(item.Collider as SphereCollider);
+                    break;
+                case ColliderType.CAPSULE:
+                    DrawCapsuleGizmo(item.Collider as CapsuleCollider);
+                    break;
+                default:
+                    Debug.LogWarning("Unsopported collider type");
+                    break;
+            }
+        }
+    }
+
+    private void DrawBoxGizmo(BoxCollider collider)
+    {
+        Bounds bounds = collider.bounds;
+        Vector3 worldScale = transform.lossyScale;
+
+        Vector3 proportionalScale = new Vector3(Mathf.Abs(collider.size.x * worldScale.x), Mathf.Abs(collider.size.y * worldScale.y), Mathf.Abs(collider.size.z * worldScale.z));
+
+        Vector3 xDisplacement = transform.right * (proportionalScale.x / 2);
+        Vector3 yDisplacement = transform.up * (proportionalScale.y / 2);
+        Vector3 zDisplacement = transform.forward * (proportionalScale.z / 2);
+
+        Vector3 topCenter = bounds.center + yDisplacement;
+        Vector3 bottomCenter = bounds.center - yDisplacement;
+
+        Vector3 topA = topCenter + xDisplacement + zDisplacement;
+        Vector3 topB = topCenter + xDisplacement - zDisplacement;
+        Vector3 topC = topCenter - xDisplacement - zDisplacement;
+        Vector3 topD = topCenter - xDisplacement + zDisplacement;
+
+        Vector3 midA = bounds.center + xDisplacement + zDisplacement;
+        Vector3 midB = bounds.center + xDisplacement - zDisplacement;
+        Vector3 midC = bounds.center - xDisplacement - zDisplacement;
+        Vector3 midD = bounds.center - xDisplacement + zDisplacement;
+
+        Vector3 botA = bottomCenter + xDisplacement + zDisplacement;
+        Vector3 botB = bottomCenter + xDisplacement - zDisplacement;
+        Vector3 botC = bottomCenter - xDisplacement - zDisplacement;
+        Vector3 botD = bottomCenter - xDisplacement + zDisplacement;
+
+        Gizmos.DrawLine(topA, topB);
+        Gizmos.DrawLine(topB, topC);
+        Gizmos.DrawLine(topC, topD);
+        Gizmos.DrawLine(topD, topA);
+
+        Gizmos.DrawLine(midA, midB);
+        Gizmos.DrawLine(midB, midC);
+        Gizmos.DrawLine(midC, midD);
+        Gizmos.DrawLine(midD, midA);
+
+        Gizmos.DrawLine(botA, botB);
+        Gizmos.DrawLine(botB, botC);
+        Gizmos.DrawLine(botC, botD);
+        Gizmos.DrawLine(botD, botA);
+
+        Gizmos.DrawLine(topA, botA);
+        Gizmos.DrawLine(topB, botB);
+        Gizmos.DrawLine(topC, botC);
+        Gizmos.DrawLine(topD, botD);
+    }
+
+    private void DrawSphereGizmo(SphereCollider collider)
+    {
+        Bounds bounds = collider.bounds;
+        Gizmos.DrawWireSphere(bounds.center, bounds.size.x / 2);
+    }
+
+    private void DrawCapsuleGizmo(CapsuleCollider collider)
+    {
+        Bounds bounds = collider.bounds;
+        Vector3 worldScale = transform.lossyScale;
+
+        float proportionalRadius;
+        float proportionalHeight;
+        Vector3 centerA;
+        Vector3 centerB;
+        Vector3 colliderNormal;
+        Vector3 heightDisplacement;
+        Vector3 radiusDisplacementA;
+        Vector3 radiusDisplacementB;
+
+        if (collider.direction == 0) // 1 = X-Axis
+        {
+            proportionalRadius = collider.radius * Mathf.Max(Mathf.Abs(worldScale.y), Mathf.Abs(worldScale.z));
+
+            proportionalHeight = GetCapsuleProportionalHeight(proportionalRadius, worldScale.x, collider.height);
+
+            colliderNormal = transform.right;
+            radiusDisplacementA = transform.forward * proportionalRadius;
+            radiusDisplacementB = transform.up * proportionalRadius;
+        }
+        else if (collider.direction == 1) // 1 = Y-Axis
+        {
+            proportionalRadius = collider.radius * Mathf.Max(Mathf.Abs(worldScale.x), Mathf.Abs(worldScale.z));
+
+            proportionalHeight = GetCapsuleProportionalHeight(proportionalRadius, worldScale.y, collider.height);
+
+            colliderNormal = transform.up;
+            radiusDisplacementA = transform.forward * proportionalRadius;
+            radiusDisplacementB = transform.right * proportionalRadius;
+        }
+        else // Z-Axis
+        {
+            proportionalRadius = collider.radius * Mathf.Max(Mathf.Abs(worldScale.x), Mathf.Abs(worldScale.y));
+
+            proportionalHeight = GetCapsuleProportionalHeight(proportionalRadius, worldScale.z, collider.height);
+
+            colliderNormal = transform.forward;
+            radiusDisplacementA = transform.up * proportionalRadius;
+            radiusDisplacementB = transform.right * proportionalRadius;
+        }
+
+        heightDisplacement = colliderNormal * proportionalHeight;
+        centerA = bounds.center + heightDisplacement;
+        centerB = bounds.center - heightDisplacement;
+
+        Gizmos.DrawLine(centerA + radiusDisplacementA, centerB + radiusDisplacementA);
+        Gizmos.DrawLine(centerA - radiusDisplacementA, centerB - radiusDisplacementA);
+        Gizmos.DrawLine(centerA + radiusDisplacementB, centerB + radiusDisplacementB);
+        Gizmos.DrawLine(centerA - radiusDisplacementB, centerB - radiusDisplacementB);
+        Handles.DrawWireDisc(bounds.center, colliderNormal, proportionalRadius);
+
+        Handles.DrawWireDisc(centerA, transform.up, proportionalRadius);
+        Handles.DrawWireDisc(centerA, transform.right, proportionalRadius);
+        Handles.DrawWireDisc(centerA, transform.forward, proportionalRadius);
+
+        Handles.DrawWireDisc(centerB, transform.up, proportionalRadius);
+        Handles.DrawWireDisc(centerB, transform.right, proportionalRadius);
+        Handles.DrawWireDisc(centerB, transform.forward, proportionalRadius);
+    }
+
+    private static float GetCapsuleProportionalHeight(float radius, float scale, float colliderHeight)
+    {
+        float height = Mathf.Abs((colliderHeight / 2) * scale - radius);
+
+        if (scale >= 0)
+        {
+            if (height < radius)
+            {
+                height = (colliderHeight * Mathf.Abs(scale) - radius * 2) / 2;
+            }
+        }
+        else
+        {
+            height -= radius * 2;
+        }
+
+        return Mathf.Max(0, height);
+    }
+}
+#endif 

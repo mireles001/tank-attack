@@ -12,22 +12,4 @@ public class InstaDeathController : MonoBehaviour
             destructibleActor.ApplyDamage(destructibleActor.GetMaxHealth(), true);
         }
     }
-
-    private void OnDrawGizmos()
-    {
-        if (_boxCollider == null)
-        {
-            return;
-        }
-
-        Bounds colliderBounds = _boxCollider.bounds;
-
-        Vector3 colliderSize = _boxCollider.size;
-        Vector3 transformScale = transform.localScale;
-
-        Vector3 size = new Vector3(colliderSize.x * transformScale.x, colliderSize.y * transformScale.y, colliderSize.z * transformScale.z);
-
-        Gizmos.color = Color.red;
-        Gizmos.DrawCube(colliderBounds.center, colliderBounds.size);
-    }
 }
