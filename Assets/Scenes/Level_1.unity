@@ -966,6 +966,74 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 206939026764352883, guid: 43409729db67c486283f1c24a225bc22, type: 3}
   m_PrefabInstance: {fileID: 456559567}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &463938951
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 463938954}
+  - component: {fileID: 463938953}
+  - component: {fileID: 463938952}
+  m_Layer: 0
+  m_Name: LevelExit
+  m_TagString: Finish
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &463938952
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 463938951}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 153426affd93c2f4d87a071a6817a981, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!136 &463938953
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 463938951}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.25
+  m_Height: 1
+  m_Direction: 1
+  m_Center: {x: 0, y: 0.5, z: 0}
+--- !u!4 &463938954
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 463938951}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 5}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &464268767
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1382,7 +1450,7 @@ GameObject:
   - component: {fileID: 724124451}
   - component: {fileID: 724124454}
   m_Layer: 0
-  m_Name: Death
+  m_Name: InstaDeathZone
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1400,7 +1468,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3c6e9c77c22acd944b4e6237c5b65999, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _boxCollider: {fileID: 724124452}
+  _damage: 0
+  _isInstaDeath: 1
+  _player: 1
+  _enemies: 1
 --- !u!65 &724124452
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2633,7 +2704,7 @@ GameObject:
   - component: {fileID: 1664966493}
   - component: {fileID: 1664966495}
   m_Layer: 0
-  m_Name: Tank
+  m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 8418204508859773708, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
@@ -2969,6 +3040,56 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 206939026764352883, guid: 43409729db67c486283f1c24a225bc22, type: 3}
   m_PrefabInstance: {fileID: 1778563175}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1869156638
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1869156639}
+  - component: {fileID: 1869156640}
+  m_Layer: 0
+  m_Name: LevelManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1869156639
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1869156638}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1869156640
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1869156638}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3e87f22eb49f5d840ad822415a582aae, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _clearAllEnemies: 0
+  _levelExit: {fileID: 0}
+  _levelExitUnlockType: 0
+  _initialWaitDuration: 1
+  _retryWaitDuration: 2
+  _nextLevelWaitDuration: 3
 --- !u!1001 &1869228934
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3329,9 +3450,11 @@ Transform:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
+  - {fileID: 1869156639}
   - {fileID: 1664966490}
   - {fileID: 958013984}
   - {fileID: 705507995}
   - {fileID: 724124453}
   - {fileID: 251403490}
   - {fileID: 194599317}
+  - {fileID: 463938954}

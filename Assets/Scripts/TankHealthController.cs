@@ -27,6 +27,16 @@ public class TankHealthController : MonoBehaviour, IDestructible
         _health = _maxHealth;
     }
 
+    public void OnTriggerEnter(Collider other)
+    {
+        DamageDealerController damageDealer = other.gameObject.GetComponent<DamageDealerController>();
+
+        if (damageDealer != null)
+        {
+            damageDealer.RequestDamage(this);
+        }
+    }
+
     private IEnumerator InvincibilityWaitTime(float waitTime)
     {
         yield return new WaitForSeconds(waitTime);
@@ -47,6 +57,11 @@ public class TankHealthController : MonoBehaviour, IDestructible
     }
 
     #region INTERFACE_DESTRUCTIBLE
+
+    public string GetObjectTag()
+    {
+        return gameObject.tag;
+    }
 
     public void ApplyDamage(int damage, bool instadeath = false)
     {

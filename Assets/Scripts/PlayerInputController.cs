@@ -56,7 +56,7 @@ public class PlayerInputController : MonoBehaviour
             return;
         }
 
-        _healthController.TankDestroyed += StopCameraTargetUpdate;
+        _healthController.TankDestroyed += OnTankDestroyed;
     }
 
     private void OnDisable()
@@ -66,7 +66,7 @@ public class PlayerInputController : MonoBehaviour
             return;
         }
 
-        _healthController.TankDestroyed -= StopCameraTargetUpdate;
+        _healthController.TankDestroyed -= OnTankDestroyed;
     }
 
     private void Start()
@@ -81,6 +81,11 @@ public class PlayerInputController : MonoBehaviour
 
     private void Update()
     {
+        if (LevelManager.Instance != null && !LevelManager.Instance.IsPlayerInputLocked)
+        {
+            return;
+        }
+
         _movementController.IsHolding = Input.GetButton(_breakButton);
         MoveTank(Time.deltaTime);
         Attack();
@@ -213,10 +218,15 @@ public class PlayerInputController : MonoBehaviour
         return direction.z * cameraForward + direction.x * cameraRight;
     }
 
-    private void StopCameraTargetUpdate()
+    private void OnTankDestroyed()
     {
-        Debug.Log("MUERTO");
+        // Disable camera-target position updates
         _isCameraTargetFreezed = true;
+
+        if (LevelManager.Instance != null)
+        {
+            LevelManager.Instance.Defeat();
+        }
     }
 
 #if UNITY_EDITOR

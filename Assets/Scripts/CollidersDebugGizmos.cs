@@ -110,11 +110,6 @@ public class CollidersDebugGizmos : MonoBehaviour
         Vector3 topC = topCenter - xDisplacement - zDisplacement;
         Vector3 topD = topCenter - xDisplacement + zDisplacement;
 
-        Vector3 midA = bounds.center + xDisplacement + zDisplacement;
-        Vector3 midB = bounds.center + xDisplacement - zDisplacement;
-        Vector3 midC = bounds.center - xDisplacement - zDisplacement;
-        Vector3 midD = bounds.center - xDisplacement + zDisplacement;
-
         Vector3 botA = bottomCenter + xDisplacement + zDisplacement;
         Vector3 botB = bottomCenter + xDisplacement - zDisplacement;
         Vector3 botC = bottomCenter - xDisplacement - zDisplacement;
@@ -124,11 +119,6 @@ public class CollidersDebugGizmos : MonoBehaviour
         Gizmos.DrawLine(topB, topC);
         Gizmos.DrawLine(topC, topD);
         Gizmos.DrawLine(topD, topA);
-
-        Gizmos.DrawLine(midA, midB);
-        Gizmos.DrawLine(midB, midC);
-        Gizmos.DrawLine(midC, midD);
-        Gizmos.DrawLine(midD, midA);
 
         Gizmos.DrawLine(botA, botB);
         Gizmos.DrawLine(botB, botC);
@@ -149,6 +139,7 @@ public class CollidersDebugGizmos : MonoBehaviour
 
     private void DrawCapsuleGizmo(CapsuleCollider collider)
     {
+        const float arcAngle = 180f;
         Bounds bounds = collider.bounds;
         Vector3 worldScale = transform.lossyScale;
 
@@ -200,15 +191,15 @@ public class CollidersDebugGizmos : MonoBehaviour
         Gizmos.DrawLine(centerA - radiusDisplacementA, centerB - radiusDisplacementA);
         Gizmos.DrawLine(centerA + radiusDisplacementB, centerB + radiusDisplacementB);
         Gizmos.DrawLine(centerA - radiusDisplacementB, centerB - radiusDisplacementB);
-        Handles.DrawWireDisc(bounds.center, colliderNormal, proportionalRadius);
 
-        Handles.DrawWireDisc(centerA, transform.up, proportionalRadius);
-        Handles.DrawWireDisc(centerA, transform.right, proportionalRadius);
-        Handles.DrawWireDisc(centerA, transform.forward, proportionalRadius);
-
-        Handles.DrawWireDisc(centerB, transform.up, proportionalRadius);
-        Handles.DrawWireDisc(centerB, transform.right, proportionalRadius);
-        Handles.DrawWireDisc(centerB, transform.forward, proportionalRadius);
+        float orientationPositive = collider.direction == 1 ? arcAngle : -arcAngle;
+        float orientationNegative = collider.direction == 1 ? -arcAngle : arcAngle;
+        Handles.DrawWireArc(centerA, radiusDisplacementA, radiusDisplacementB, orientationPositive, proportionalRadius);
+        Handles.DrawWireArc(centerA, radiusDisplacementB, radiusDisplacementA, orientationNegative, proportionalRadius);
+        Handles.DrawWireArc(centerB, radiusDisplacementA, radiusDisplacementB, orientationNegative, proportionalRadius);
+        Handles.DrawWireArc(centerB, radiusDisplacementB, radiusDisplacementA, orientationPositive, proportionalRadius);
+        Handles.DrawWireDisc(centerA, colliderNormal, proportionalRadius);
+        Handles.DrawWireDisc(centerB, colliderNormal, proportionalRadius);
     }
 
     private static float GetCapsuleProportionalHeight(float radius, float scale, float colliderHeight)
