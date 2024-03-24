@@ -1,18 +1,33 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class ProjectileController : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    [SerializeField] private float _projectileSpeed;
+    [SerializeField] private float _autoDestroyTimer = 5f;
+    [SerializeField] private ParticleSystem _impactFx;
+
+    private float _currentTimer;
+
+    private void Update()
     {
-        
+        transform.Translate(Vector3.forward * _projectileSpeed * Time.deltaTime);
+
+        _currentTimer += Time.deltaTime;
+
+        if (_currentTimer >= _autoDestroyTimer)
+        {
+            Destroy(gameObject);
+            return;
+        }
     }
 
-    // Update is called once per frame
-    void Update()
+    private void ProjectileImpact(Vector3 spawnPoint)
     {
-        
+        if (_impactFx != null)
+        {
+            Instantiate(_impactFx).transform.position = spawnPoint;
+        }
+
+        Destroy(gameObject);
     }
 }

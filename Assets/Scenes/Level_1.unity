@@ -996,6 +996,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 153426affd93c2f4d87a071a6817a981, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _toggleColliderIsTrigger: 0
+  _onUnlockEvents:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!136 &463938953
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -1011,7 +1015,7 @@ CapsuleCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
@@ -1520,6 +1524,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fce7143d4c4fcc845b2bfd2705107315, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _gizmosColor: {r: 1, g: 0, b: 0, a: 1}
 --- !u!1001 &743462356
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2832,7 +2837,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _projectileSpawner: {fileID: 1346963896}
-  _projectile: {fileID: 0}
+  _projectile: {fileID: 275651624632095003, guid: 9e0de26cff16edc478d21f46d81806d5, type: 3}
   _attackIntervalTime: 0.4
   _attackFx: {fileID: 0}
   _cannonTransform: {fileID: 191614124}
@@ -3085,11 +3090,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _clearAllEnemies: 0
-  _levelExit: {fileID: 0}
+  _levelExit: {fileID: 463938952}
   _levelExitUnlockType: 0
-  _initialWaitDuration: 1
-  _retryWaitDuration: 2
-  _nextLevelWaitDuration: 3
+  _settings: {fileID: 11400000, guid: ea386760f819faa4bab1aaea39e5e7c1, type: 2}
 --- !u!1001 &1869228934
 PrefabInstance:
   m_ObjectHideFlags: 0

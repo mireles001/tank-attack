@@ -27,14 +27,24 @@ public class TankHealthController : MonoBehaviour, IDestructible
         _health = _maxHealth;
     }
 
+    public void OnCollisionEnter(Collision collision)
+    {
+        DamageDealerInteraction(collision.gameObject.GetComponent<DamageDealerController>());
+    }
+
     public void OnTriggerEnter(Collider other)
     {
-        DamageDealerController damageDealer = other.gameObject.GetComponent<DamageDealerController>();
+        DamageDealerInteraction(other.gameObject.GetComponent<DamageDealerController>());
+    }
 
-        if (damageDealer != null)
+    private void DamageDealerInteraction(DamageDealerController damageDealer)
+    {
+        if (damageDealer == null)
         {
-            damageDealer.RequestDamage(this);
+            return;
         }
+
+        damageDealer.RequestDamage(this);
     }
 
     private IEnumerator InvincibilityWaitTime(float waitTime)
@@ -98,6 +108,8 @@ public class TankHealthController : MonoBehaviour, IDestructible
 
             TankDestroyed?.Invoke();
         }
+
+        Debug.Log($"Current Health: {_health}");
     }
 
     public int GetHealth()

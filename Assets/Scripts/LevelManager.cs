@@ -14,11 +14,6 @@ public class LevelManager : MonoBehaviour
     }
     private static LevelManager _instance;
 
-    public event Action LevelStart;
-    public event Action LevelFinish;
-    public event Action LevelDefeat;
-    public bool IsPlayerInputLocked { private set; get; }
-
     private enum ExitUnlockType
     {
         AlwaysUnlocked,
@@ -27,16 +22,47 @@ public class LevelManager : MonoBehaviour
         UseKeyAndClearEnemies
     }
 
+    public event Action LevelStart;
+    public event Action LevelEnd;
+    public event Action PlayerDefeat;
+
+    public bool IsPlayerInputLocked
+    {
+        get
+        {
+            return !_activeGameplay;
+        }
+    }
+
+    public bool PlayerHasKey
+    {
+        get
+        {
+            return _hasKey;
+        }
+    }
+
+    public LevelSettings Settings
+    {
+        get
+        {
+            return _settings;
+        }
+    }
+
     [Header("Conditions of victory")]
     [SerializeField] private bool _clearAllEnemies;
     [SerializeField] private LevelExitController _levelExit;
     [SerializeField] private ExitUnlockType _levelExitUnlockType;
 
-    [Header("Timers")]
-    [SerializeField] private float _initialWaitDuration;
-    [SerializeField] private float _retryWaitDuration;
-    [SerializeField] private float _nextLevelWaitDuration;
+    [Header("Global settings")]
+    [SerializeField] private LevelSettings _settings;
 
+    private readonly float VICTORY_CONDITION_CHECK_TIC = 0.75f;
+
+    private bool _activeGameplay;
+    private bool _hasKey;
+    private int _enemies;
     private Coroutine _levelManagerCoroutine;
 
     private void OnDisable()
@@ -51,45 +77,124 @@ public class LevelManager : MonoBehaviour
 
     private void Start()
     {
-        _levelManagerCoroutine = StartCoroutine(InitialWait());
+        if (Settings == null)
+        {
+            return;
+        }
+
+        _levelManagerCoroutine = StartCoroutine(StartWait());
     }
 
-    public void Finish()
+    private void StatusCheck()
     {
-        IsPlayerInputLocked = true;
-        LevelFinish?.Invoke();
+        if (!_activeGameplay)
+        {
+            return;
+        }
 
         KillCoroutine();
-        _levelManagerCoroutine = StartCoroutine(NextLevelWait());
+        _levelManagerCoroutine = StartCoroutine(StatusCheckWait());
+    }
+
+    private void RunStatusCheck()
+    {
+        if (_levelExit == null)
+        {
+            if (!_clearAllEnemies || _enemies == 0)
+            {
+                End();
+            }
+        }
+        else if (_levelExit.IsLocked)
+        {
+            _clearAllEnemies = _levelExitUnlockType == ExitUnlockType.ClearEnemies || _levelExitUnlockType == ExitUnlockType.UseKeyAndClearEnemies;
+
+            if (_levelExitUnlockType == ExitUnlockType.AlwaysUnlocked)
+            {
+                _levelExit.Unlock();
+            }
+            else if (_levelExitUnlockType == ExitUnlockType.UseKey && PlayerHasKey)
+            {
+                _levelExit.Unlock();
+            }
+            else if (_levelExitUnlockType == ExitUnlockType.ClearEnemies && _enemies == 0)
+            {
+                _levelExit.Unlock();
+            }
+            else if (_levelExitUnlockType == ExitUnlockType.UseKeyAndClearEnemies && PlayerHasKey && _enemies == 0)
+            {
+                _levelExit.Unlock();
+            }
+        }
+    }
+
+    public void End()
+    {
+        Debug.Log("NEXT LEVEL");
+        _activeGameplay = false;
+        LevelEnd?.Invoke();
+
+        KillCoroutine();
+        _levelManagerCoroutine = StartCoroutine(EndWait());
     }
 
     public void Defeat()
     {
-        IsPlayerInputLocked = true;
-        LevelDefeat?.Invoke();
+        Debug.Log("RETRY LEVEL");
+        _activeGameplay = false;
+        PlayerDefeat?.Invoke();
 
         KillCoroutine();
         _levelManagerCoroutine = StartCoroutine(RetryWait());
     }
 
-    private IEnumerator InitialWait()
+    public void AddEnemy()
     {
-        yield return new WaitForSeconds(_initialWaitDuration);
-
-        IsPlayerInputLocked = true;
-        LevelStart?.Invoke();
+        _enemies++;
+        StatusCheck();
     }
 
-    private IEnumerator NextLevelWait()
+    public void RemoveEnemy()
     {
-        yield return new WaitForSeconds(_nextLevelWaitDuration);
+        _enemies--;
+        _enemies = Mathf.Max(0, _enemies);
+        StatusCheck();
+    }
 
-        Debug.Log("Go to next level");
+    public void PickUpKey()
+    {
+        _hasKey = true;
+        StatusCheck();
+    }
+
+    private IEnumerator StatusCheckWait()
+    {
+        yield return new WaitForSeconds(VICTORY_CONDITION_CHECK_TIC);
+
+        RunStatusCheck();
+    }
+
+    private IEnumerator StartWait()
+    {
+        yield return new WaitForSeconds(Settings.StartWaitDuration);
+
+        _activeGameplay = true;
+        LevelStart?.Invoke();
+
+        StatusCheck();
+    }
+
+    private IEnumerator EndWait()
+    {
+        yield return new WaitForSeconds(Settings.EndWaitDuration);
+
+        // TODO: Apply going to next level
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
     private IEnumerator RetryWait()
     {
-        yield return new WaitForSeconds(_retryWaitDuration);
+        yield return new WaitForSeconds(Settings.RetryWaitDuration);
 
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }

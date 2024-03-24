@@ -1,40 +1,43 @@
 using UnityEngine;
+using UnityEngine.Events;
 
 [RequireComponent(typeof(Collider))]
 public class LevelExitController : MonoBehaviour
 {
-    public bool IsLocked
+    [Tooltip("Locked = Non-Trigger, Unlocked = Trigger")]
+    [SerializeField] private bool _toggleColliderIsTrigger;
+    [Space, Header("Events to be played when exit is unlocked (optional)"), Space]
+    [SerializeField] private UnityEvent _onUnlockEvents;
+
+    public bool IsLocked { private set; get; } = true;
+
+    private void Awake()
     {
-        get
+        if (_toggleColliderIsTrigger)
         {
-            return _isLocked;
+            UpdateColliderStatus();
         }
     }
 
-    private bool _isLocked = true;
+    public void Unlock()
+    {
+        IsLocked = false;
+        _onUnlockEvents?.Invoke();
+        UpdateColliderStatus();
+    }
 
-    private void Awake()
+    private void UpdateColliderStatus()
     {
         Collider[] colliders = gameObject.GetComponents<Collider>();
         foreach (Collider col in colliders)
         {
-            col.isTrigger = true;
+            col.isTrigger = !IsLocked;
         }
-    }
-
-    public void SetIsLocked(bool val)
-    {
-        if (_isLocked == val)
-        {
-            return;
-        }
-
-        _isLocked = val;
     }
 
     private void OnDrawGizmos()
     {
-        Gizmos.color = _isLocked ? Color.red : Color.green;
-        Gizmos.DrawSphere(transform.position, 0.5f);
+        Gizmos.color = IsLocked ? Color.red : Color.green;
+        Gizmos.DrawSphere(transform.position + Vector3.up * 0.333f, 0.333f);
     }
 }

@@ -81,7 +81,7 @@ public class PlayerInputController : MonoBehaviour
 
     private void Update()
     {
-        if (LevelManager.Instance != null && !LevelManager.Instance.IsPlayerInputLocked)
+        if (LevelManager.Instance != null && LevelManager.Instance.IsPlayerInputLocked)
         {
             return;
         }
@@ -90,6 +90,15 @@ public class PlayerInputController : MonoBehaviour
         MoveTank(Time.deltaTime);
         Attack();
         MoveCannon();
+    }
+
+    public void OnTriggerEnter(Collider other)
+    {
+        LevelExitController exit = other.gameObject.GetComponent<LevelExitController>();
+        if (LevelManager.Instance != null && !LevelManager.Instance.IsPlayerInputLocked && exit != null && !exit.IsLocked)
+        {
+            LevelManager.Instance.End();
+        }
     }
 
     #endregion

@@ -10,7 +10,14 @@ public class DamageDealerController : MonoBehaviour
 
     public void RequestDamage(IDestructible destructibleObject)
     {
-        if ((destructibleObject.GetObjectTag().Equals("Player") && !_player) || (destructibleObject.GetObjectTag().Equals("Enemy") && !_enemies))
+        if (LevelManager.Instance == null)
+        {
+            return;
+        }
+
+        LevelSettings settings = LevelManager.Instance.Settings;
+
+        if ((destructibleObject.GetObjectTag().Equals(settings.PlayerTag) && !_player) || (destructibleObject.GetObjectTag().Equals(settings.EnemyTag) && !_enemies))
         {
             return;
         }

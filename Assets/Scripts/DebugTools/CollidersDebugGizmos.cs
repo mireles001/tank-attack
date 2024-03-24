@@ -1,10 +1,10 @@
-#if UNITY_EDITOR
 using UnityEditor;
 using UnityEngine;
 
 [ExecuteInEditMode]
 public class CollidersDebugGizmos : MonoBehaviour
 {
+#if UNITY_EDITOR
     private enum ColliderType
     {
         BOX, SPHERE, CAPSULE, OTHER
@@ -21,10 +21,12 @@ public class CollidersDebugGizmos : MonoBehaviour
         }
     }
 
-    private ColliderItem[] _colliders;
-    private readonly Color GIZMOS_COLOR = Color.red;
+    [Header("EXECUTES IN EDITOR ONLY")]
+    [SerializeField] private Color _gizmosColor = Color.red;
 
-    private void Update()
+    private ColliderItem[] _colliders;
+
+    private void LateUpdate()
     {
         GetColliders();
     }
@@ -63,8 +65,8 @@ public class CollidersDebugGizmos : MonoBehaviour
             return;
         }
 
-        Gizmos.color = GIZMOS_COLOR;
-        Handles.color = GIZMOS_COLOR;
+        Gizmos.color = _gizmosColor;
+        Handles.color = _gizmosColor;
 
         foreach (ColliderItem item in _colliders)
         {
@@ -76,13 +78,13 @@ public class CollidersDebugGizmos : MonoBehaviour
             switch (item.Type)
             {
                 case ColliderType.BOX:
-                    DrawBoxGizmo(item.Collider as BoxCollider);
+                    DrawBoxGizmo(item.Collider as BoxCollider, transform);
                     break;
                 case ColliderType.SPHERE:
-                    DrawSphereGizmo(item.Collider as SphereCollider);
+                    DrawSphereGizmo(item.Collider as SphereCollider, transform);
                     break;
                 case ColliderType.CAPSULE:
-                    DrawCapsuleGizmo(item.Collider as CapsuleCollider);
+                    DrawCapsuleGizmo(item.Collider as CapsuleCollider, transform);
                     break;
                 default:
                     Debug.LogWarning("Unsopported collider type");
@@ -91,16 +93,16 @@ public class CollidersDebugGizmos : MonoBehaviour
         }
     }
 
-    private void DrawBoxGizmo(BoxCollider collider)
+    private static void DrawBoxGizmo(BoxCollider collider, Transform t)
     {
         Bounds bounds = collider.bounds;
-        Vector3 worldScale = transform.lossyScale;
+        Vector3 worldScale = t.lossyScale;
 
         Vector3 proportionalScale = new Vector3(Mathf.Abs(collider.size.x * worldScale.x), Mathf.Abs(collider.size.y * worldScale.y), Mathf.Abs(collider.size.z * worldScale.z));
 
-        Vector3 xDisplacement = transform.right * (proportionalScale.x / 2);
-        Vector3 yDisplacement = transform.up * (proportionalScale.y / 2);
-        Vector3 zDisplacement = transform.forward * (proportionalScale.z / 2);
+        Vector3 xDisplacement = t.right * (proportionalScale.x / 2);
+        Vector3 yDisplacement = t.up * (proportionalScale.y / 2);
+        Vector3 zDisplacement = t.forward * (proportionalScale.z / 2);
 
         Vector3 topCenter = bounds.center + yDisplacement;
         Vector3 bottomCenter = bounds.center - yDisplacement;
@@ -131,17 +133,17 @@ public class CollidersDebugGizmos : MonoBehaviour
         Gizmos.DrawLine(topD, botD);
     }
 
-    private void DrawSphereGizmo(SphereCollider collider)
+    private static void DrawSphereGizmo(SphereCollider collider, Transform t)
     {
         Bounds bounds = collider.bounds;
         Gizmos.DrawWireSphere(bounds.center, bounds.size.x / 2);
     }
 
-    private void DrawCapsuleGizmo(CapsuleCollider collider)
+    private static void DrawCapsuleGizmo(CapsuleCollider collider, Transform t)
     {
         const float arcAngle = 180f;
         Bounds bounds = collider.bounds;
-        Vector3 worldScale = transform.lossyScale;
+        Vector3 worldScale = t.lossyScale;
 
         float proportionalRadius;
         float proportionalHeight;
@@ -158,9 +160,9 @@ public class CollidersDebugGizmos : MonoBehaviour
 
             proportionalHeight = GetCapsuleProportionalHeight(proportionalRadius, worldScale.x, collider.height);
 
-            colliderNormal = transform.right;
-            radiusDisplacementA = transform.forward * proportionalRadius;
-            radiusDisplacementB = transform.up * proportionalRadius;
+            colliderNormal = t.right;
+            radiusDisplacementA = t.forward * proportionalRadius;
+            radiusDisplacementB = t.up * proportionalRadius;
         }
         else if (collider.direction == 1) // 1 = Y-Axis
         {
@@ -168,9 +170,9 @@ public class CollidersDebugGizmos : MonoBehaviour
 
             proportionalHeight = GetCapsuleProportionalHeight(proportionalRadius, worldScale.y, collider.height);
 
-            colliderNormal = transform.up;
-            radiusDisplacementA = transform.forward * proportionalRadius;
-            radiusDisplacementB = transform.right * proportionalRadius;
+            colliderNormal = t.up;
+            radiusDisplacementA = t.forward * proportionalRadius;
+            radiusDisplacementB = t.right * proportionalRadius;
         }
         else // Z-Axis
         {
@@ -178,9 +180,9 @@ public class CollidersDebugGizmos : MonoBehaviour
 
             proportionalHeight = GetCapsuleProportionalHeight(proportionalRadius, worldScale.z, collider.height);
 
-            colliderNormal = transform.forward;
-            radiusDisplacementA = transform.up * proportionalRadius;
-            radiusDisplacementB = transform.right * proportionalRadius;
+            colliderNormal = t.forward;
+            radiusDisplacementA = t.up * proportionalRadius;
+            radiusDisplacementB = t.right * proportionalRadius;
         }
 
         heightDisplacement = colliderNormal * proportionalHeight;
@@ -220,5 +222,5 @@ public class CollidersDebugGizmos : MonoBehaviour
 
         return Mathf.Max(0, height);
     }
+#endif
 }
-#endif 
