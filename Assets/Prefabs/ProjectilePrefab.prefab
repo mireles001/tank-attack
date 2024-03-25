@@ -95,9 +95,8 @@ GameObject:
   m_Component:
   - component: {fileID: 2652353855170176097}
   - component: {fileID: 1602351897168571797}
-  - component: {fileID: 5699986046126142453}
   - component: {fileID: 275651624632095003}
-  - component: {fileID: 3722899425552265046}
+  - component: {fileID: 5492886995472017521}
   m_Layer: 0
   m_Name: ProjectilePrefab
   m_TagString: Untagged
@@ -140,9 +139,25 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 0.3
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!54 &5699986046126142453
+  m_Radius: 0.25
+  m_Center: {x: 0, y: 0, z: 0.05}
+--- !u!114 &275651624632095003
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5571787646923236174}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 45fef8e33cecccd4eab06997cd2a218d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _projectileDamage: 0
+  _projectileSpeed: 15
+  _autoDestroyTimer: 2
+  _impactFx: {fileID: 0}
+--- !u!54 &5492886995472017521
 Rigidbody:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -169,34 +184,3 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &275651624632095003
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5571787646923236174}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 45fef8e33cecccd4eab06997cd2a218d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _projectileSpeed: 10
-  _autoDestroyTimer: 5
-  _impactFx: {fileID: 0}
---- !u!114 &3722899425552265046
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5571787646923236174}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3c6e9c77c22acd944b4e6237c5b65999, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _damage: 2
-  _isInstaDeath: 0
-  _player: 0
-  _enemies: 1

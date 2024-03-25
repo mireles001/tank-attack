@@ -71,7 +71,9 @@ public class PlayerInputController : MonoBehaviour
 
     private void Start()
     {
+#if !UNITY_EDITOR
         Cursor.lockState = CursorLockMode.Confined;
+#endif
 
         _forwardPointhDistance = Mathf.Max(0, _forwardPointhDistance);
         _forwardPointhDamp = Mathf.Max(0, _forwardPointhDamp);

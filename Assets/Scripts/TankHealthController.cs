@@ -29,15 +29,15 @@ public class TankHealthController : MonoBehaviour, IDestructible
 
     public void OnCollisionEnter(Collision collision)
     {
-        DamageDealerInteraction(collision.gameObject.GetComponent<DamageDealerController>());
+        DamageDealerInteraction(collision.gameObject.GetComponent<WorldHazardController>());
     }
 
     public void OnTriggerEnter(Collider other)
     {
-        DamageDealerInteraction(other.gameObject.GetComponent<DamageDealerController>());
+        DamageDealerInteraction(other.gameObject.GetComponent<WorldHazardController>());
     }
 
-    private void DamageDealerInteraction(DamageDealerController damageDealer)
+    private void DamageDealerInteraction(WorldHazardController damageDealer)
     {
         if (damageDealer == null)
         {
@@ -73,21 +73,14 @@ public class TankHealthController : MonoBehaviour, IDestructible
         return gameObject.tag;
     }
 
-    public void ApplyDamage(int damage, bool instadeath = false)
+    public void ApplyDamage(int damage)
     {
         if (_isInvincible)
         {
             return;
         }
 
-        if (instadeath)
-        {
-            _health = 0;
-        }
-        else
-        {
-            _health -= damage;
-        }
+        _health -= damage;
 
         if (_health > 0)
         {

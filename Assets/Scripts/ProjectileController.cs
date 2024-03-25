@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class ProjectileController : MonoBehaviour
 {
+    [SerializeField] private int _projectileDamage;
     [SerializeField] private float _projectileSpeed;
     [SerializeField] private float _autoDestroyTimer = 5f;
     [SerializeField] private ParticleSystem _impactFx;
@@ -18,6 +19,20 @@ public class ProjectileController : MonoBehaviour
         {
             Destroy(gameObject);
             return;
+        }
+    }
+
+    public void OnCollisionEnter(Collision collision)
+    {
+        IDestructible destructibleObject = collision.gameObject.GetComponent<IDestructible>();
+        if (destructibleObject != null)
+        {
+            destructibleObject.ApplyDamage(_projectileDamage);
+        }
+
+        if (collision.contactCount > 0)
+        {
+            ProjectileImpact(collision.contacts[0].point);
         }
     }
 
