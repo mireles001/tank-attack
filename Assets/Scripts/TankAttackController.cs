@@ -21,6 +21,7 @@ public class TankAttackController : MonoBehaviour
     [SerializeField] private float _cannonRotationSpeed;
 
     private bool _onCooldown;
+    private Collider[] _tankColliders;
     private Coroutine _attackIntervalCoroutine;
 
     #region LIFE_CYCLE
@@ -28,6 +29,11 @@ public class TankAttackController : MonoBehaviour
     private void OnDisable()
     {
         KillAttackCoroutine();
+    }
+
+    private void Start()
+    {
+        _tankColliders = gameObject.GetComponentsInChildren<Collider>();
     }
 
     #endregion
@@ -61,7 +67,7 @@ public class TankAttackController : MonoBehaviour
     {
         if (_projectile != null)
         {
-            Instantiate(_projectile).transform.SetPositionAndRotation(_projectileSpawner.position, _projectileSpawner.rotation);
+            Instantiate(_projectile).StartUp(_tankColliders).SetPositionAndRotation(_projectileSpawner.position, _projectileSpawner.rotation);
         }
 
         if (_attackFx != null)
