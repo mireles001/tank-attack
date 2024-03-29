@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.Events;
 
-[RequireComponent(typeof(Collider))]
+[RequireComponent(typeof(Collider)), DisallowMultipleComponent]
 public class LevelExitController : MonoBehaviour
 {
     [Tooltip("Locked = Non-Trigger, Unlocked = Trigger")]

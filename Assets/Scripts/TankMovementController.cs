@@ -1,5 +1,6 @@
 using UnityEngine;
 
+[DisallowMultipleComponent]
 public class TankMovementController : MonoBehaviour
 {
     public bool IsHolding { get; set; }

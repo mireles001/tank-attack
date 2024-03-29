@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 
+[DisallowMultipleComponent]
 public class TankHealthController : MonoBehaviour, IDestructible
 {
     public event Action TankHealthModified;
@@ -80,7 +81,8 @@ public class TankHealthController : MonoBehaviour, IDestructible
             return;
         }
 
-        _health -= damage;
+        _health = Mathf.Max(0, _health - damage);
+        TankHealthModified?.Invoke();
 
         if (_health > 0)
         {
@@ -89,8 +91,6 @@ public class TankHealthController : MonoBehaviour, IDestructible
                 _isInvincible = true;
                 _invicibilityCoroutine = StartCoroutine(InvincibilityWaitTime(_invincibilityDuration));
             }
-
-            TankHealthModified?.Invoke();
         }
         else
         {
@@ -101,8 +101,6 @@ public class TankHealthController : MonoBehaviour, IDestructible
 
             TankDestroyed?.Invoke();
         }
-
-        Debug.Log($"Current Health: {_health}");
     }
 
     public int GetHealth()

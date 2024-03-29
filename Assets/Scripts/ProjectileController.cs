@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
+[DisallowMultipleComponent]
 public class ProjectileController : MonoBehaviour
 {
     [SerializeField] private Collider _projectileCollider;
@@ -8,6 +9,8 @@ public class ProjectileController : MonoBehaviour
     [SerializeField] private float _projectileSpeed;
     [SerializeField] private float _autoDestroyTimer = 5f;
     [SerializeField] private ParticleSystem _impactFx;
+    [Space]
+    [SerializeField] private bool _ignoreOtherProjectiles;
 
     private Coroutine _autoDestroyCoroutine;
 
@@ -23,7 +26,10 @@ public class ProjectileController : MonoBehaviour
             Physics.IgnoreCollision(collider, _projectileCollider);
         }
 
-        _autoDestroyCoroutine = StartCoroutine(AutoDestroyWait());
+        if (_autoDestroyTimer > 0)
+        {
+            _autoDestroyCoroutine = StartCoroutine(AutoDestroyWait());
+        }
 
         return transform;
     }
@@ -35,6 +41,16 @@ public class ProjectileController : MonoBehaviour
 
     public void OnCollisionEnter(Collision collision)
     {
+        if (_ignoreOtherProjectiles)
+        {
+            ProjectileController otherProjectile = collision.gameObject.GetComponent<ProjectileController>();
+            if (otherProjectile != null)
+            {
+                Physics.IgnoreCollision(collision.collider, _projectileCollider);
+                return;
+            }
+        }
+
         collision.gameObject.GetComponent<IDestructible>()?.ApplyDamage(_projectileDamage);
 
         if (collision.contactCount > 0)

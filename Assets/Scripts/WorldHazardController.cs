@@ -1,5 +1,6 @@
 using UnityEngine;
 
+[DisallowMultipleComponent]
 public class WorldHazardController : MonoBehaviour
 {
     [SerializeField] private int _damage;

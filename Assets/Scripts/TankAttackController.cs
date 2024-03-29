@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
+[DisallowMultipleComponent]
 public class TankAttackController : MonoBehaviour
 {
     public Transform CannonTransform
