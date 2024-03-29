@@ -12,6 +12,7 @@ public class ProjectileController : MonoBehaviour
     [Space]
     [SerializeField] private bool _ignoreOtherProjectiles;
 
+    private LevelSettings _settings;
     private Coroutine _autoDestroyCoroutine;
 
     private void OnDisable()
@@ -31,6 +32,11 @@ public class ProjectileController : MonoBehaviour
             _autoDestroyCoroutine = StartCoroutine(AutoDestroyWait());
         }
 
+        if (LevelManager.Instance != null)
+        {
+            _settings = LevelManager.Instance.Settings;
+        }
+
         return transform;
     }
 
@@ -41,6 +47,19 @@ public class ProjectileController : MonoBehaviour
 
     public void OnCollisionEnter(Collision collision)
     {
+        if (_settings != null)
+        {
+            if (!collision.gameObject.tag.Equals(_settings.PlayerTag) && !collision.gameObject.tag.Equals(_settings.EnemyTag))
+            {
+                ExitKeyController exitKey = collision.gameObject.GetComponent<ExitKeyController>();
+                if (exitKey != null)
+                {
+                    Physics.IgnoreCollision(collision.collider, _projectileCollider);
+                    return;
+                }
+            }
+        }
+
         if (_ignoreOtherProjectiles)
         {
             ProjectileController otherProjectile = collision.gameObject.GetComponent<ProjectileController>();

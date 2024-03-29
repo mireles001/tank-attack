@@ -10,7 +10,6 @@ public class TankHealthController : MonoBehaviour, IDestructible
 
     [SerializeField] private int _maxHealth;
     [SerializeField] private float _invincibilityDuration;
-    [SerializeField] private MonoBehaviour[] _toggleableScriptComponents;
     [Header("Visual FXs")]
     [SerializeField] private ParticleSystem _tankDestroyedFx;
 
@@ -25,6 +24,7 @@ public class TankHealthController : MonoBehaviour, IDestructible
 
     private void Awake()
     {
+        _maxHealth = Mathf.Max(1, _maxHealth);
         _health = _maxHealth;
     }
 

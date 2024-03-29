@@ -757,10 +757,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd998e8d9a511a14cb24741b715ebe85, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _maxHealth: 5
+  _maxHealth: 10
   _invincibilityDuration: 1.5
-  _toggleableScriptComponents:
-  - {fileID: 2358089780026936927}
   _tankDestroyedFx: {fileID: 0}
 --- !u!114 &3224486284363284495
 MonoBehaviour:

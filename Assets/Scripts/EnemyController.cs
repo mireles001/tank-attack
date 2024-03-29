@@ -1,18 +1,14 @@
 using UnityEngine;
+using UnityEngine.Events;
 
-[DisallowMultipleComponent]
-public class EnemyController : MonoBehaviour
+public class EnemyController : BaseTankController
 {
-    [SerializeField] private TankHealthController _healthController;
-    [SerializeField] private TankMovementController _movementController;
-    [SerializeField] private TankAttackController _attackController;
+    [Space, Header("Execute events on destroy"), Space]
+    [SerializeField] private UnityEvent _onDestroyEvents;
 
-    private void OnDisable()
+    protected override void OnDisable()
     {
-        if (_healthController != null)
-        {
-            _healthController.TankDestroyed -= OnTankDestroyed;
-        }
+        base.OnDisable();
 
         if (LevelManager.Instance == null)
         {
@@ -20,19 +16,14 @@ public class EnemyController : MonoBehaviour
         }
 
         LevelManager.Instance.RemoveEnemy();
-
         LevelManager.Instance.LevelStart -= OnLevelStart;
         LevelManager.Instance.LevelEnd -= OnLevelEnd;
         LevelManager.Instance.PlayerDefeat -= OnPlayerDefeat;
     }
 
-    private void Start()
+    protected override void Start()
     {
-        if (_healthController != null)
-        {
-            _healthController.TankDestroyed += OnTankDestroyed;
-        }
-
+        base.Start();
 
         if (LevelManager.Instance == null)
         {
@@ -40,7 +31,6 @@ public class EnemyController : MonoBehaviour
         }
 
         LevelManager.Instance.AddEnemy();
-
         LevelManager.Instance.LevelStart += OnLevelStart;
         LevelManager.Instance.LevelEnd += OnLevelEnd;
         LevelManager.Instance.PlayerDefeat += OnPlayerDefeat;
@@ -61,8 +51,11 @@ public class EnemyController : MonoBehaviour
 
     }
 
-    private void OnTankDestroyed()
+    protected override void OnTankDestroyed()
     {
+        base.OnTankDestroyed();
+
+        _onDestroyEvents?.Invoke();
         Destroy(gameObject);
     }
 }

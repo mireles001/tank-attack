@@ -1,7 +1,6 @@
 using UnityEngine;
 
-[DisallowMultipleComponent]
-public class PlayerInputController : MonoBehaviour
+public class PlayerInputController : BaseTankController
 {
     public Transform MovementTarget
     {
@@ -23,9 +22,6 @@ public class PlayerInputController : MonoBehaviour
         }
     }
 
-    [SerializeField] private TankHealthController _healthController;
-    [SerializeField] private TankMovementController _movementController;
-    [SerializeField] private TankAttackController _attackController;
     [SerializeField] private Camera _camera;
     [SerializeField] private float _forwardPointhDistance;
     [SerializeField] private float _forwardPointhDamp;
@@ -50,28 +46,10 @@ public class PlayerInputController : MonoBehaviour
 
     #region LIFE_CYCLE
 
-    private void OnEnable()
+    protected override void Start()
     {
-        if (_healthController == null)
-        {
-            return;
-        }
+        base.Start();
 
-        _healthController.TankDestroyed += OnTankDestroyed;
-    }
-
-    private void OnDisable()
-    {
-        if (_healthController == null)
-        {
-            return;
-        }
-
-        _healthController.TankDestroyed -= OnTankDestroyed;
-    }
-
-    private void Start()
-    {
 #if !UNITY_EDITOR
         Cursor.lockState = CursorLockMode.Confined;
 #endif
@@ -84,7 +62,7 @@ public class PlayerInputController : MonoBehaviour
 
     private void Update()
     {
-        if (LevelManager.Instance != null && LevelManager.Instance.IsPlayerInputLocked)
+        if (!_isAlive || (LevelManager.Instance != null && LevelManager.Instance.IsPlayerInputLocked))
         {
             return;
         }
@@ -97,6 +75,11 @@ public class PlayerInputController : MonoBehaviour
 
     public void OnTriggerEnter(Collider other)
     {
+        if (!_isAlive)
+        {
+            return;
+        }
+
         LevelExitController exit = other.gameObject.GetComponent<LevelExitController>();
         if (LevelManager.Instance != null && !LevelManager.Instance.IsPlayerInputLocked && exit != null && !exit.IsLocked)
         {
@@ -230,8 +213,10 @@ public class PlayerInputController : MonoBehaviour
         return direction.z * cameraForward + direction.x * cameraRight;
     }
 
-    private void OnTankDestroyed()
+    protected override void OnTankDestroyed()
     {
+        base.OnTankDestroyed();
+
         // Disable camera-target position updates
         _isCameraTargetFreezed = true;
 

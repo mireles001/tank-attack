@@ -6,7 +6,7 @@ public class LevelExitController : MonoBehaviour
 {
     [Tooltip("Locked = Non-Trigger, Unlocked = Trigger")]
     [SerializeField] private bool _toggleColliderIsTrigger;
-    [Space, Header("Events to be played when exit is unlocked (optional)"), Space]
+    [Space, Header("Execute events on exit unlocked (optional)"), Space]
     [SerializeField] private UnityEvent _onUnlockEvents;
 
     public bool IsLocked { private set; get; } = true;
