@@ -3,6 +3,7 @@ using UnityEngine.Events;
 
 public class EnemyController : BaseTankController
 {
+    [SerializeField] private AggroController _aggroController;
     [Space, Header("Execute events on destroy"), Space]
     [SerializeField] private UnityEvent _onDestroyEvents;
 
@@ -38,7 +39,7 @@ public class EnemyController : BaseTankController
 
     private void OnLevelStart()
     {
-
+        _aggroController.OnLevelStart(_healthController);
     }
 
     private void OnLevelEnd()
