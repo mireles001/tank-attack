@@ -2,34 +2,48 @@ using System.Collections;
 using UnityEngine;
 
 [DisallowMultipleComponent]
-public class TankAttackController : MonoBehaviour
+public class TurretAttackController : MonoBehaviour
 {
-    public Transform CannonTransform
+    public Transform TurretTransform
     {
         get
         {
-            return _cannonTransform;
+            return _turretTransform;
+        }
+    }
+
+    public bool OnCoolDown
+    {
+        get
+        {
+            return _onCooldown;
         }
     }
 
     [Header("Attack (Projectile shooting)")]
     [SerializeField] private Transform _projectileSpawner;
     [SerializeField] private ProjectileController _projectile;
+    [Tooltip("Hold time between attacks")]
     [SerializeField] private float _attackIntervalTime;
+    [Tooltip("After attacking rotation hold time")]
+    [SerializeField] private float _rotationHoldDuration;
     [SerializeField] private ParticleSystem _attackFx;
-    [Header("Cannon Movement")]
-    [SerializeField] private Transform _cannonTransform;
-    [SerializeField] private float _cannonRotationSpeed;
+    [Header("Turret Movement")]
+    [SerializeField] private Transform _turretTransform;
+    [SerializeField] private float _turretRotationSpeed;
 
     private bool _onCooldown;
+    private bool _onRotationHold;
     private Collider[] _tankColliders;
     private Coroutine _attackIntervalCoroutine;
+    private Coroutine _rotationHoldCoroutine;
 
     #region LIFE_CYCLE
 
     private void OnDisable()
     {
         KillAttackCoroutine();
+        KillRotationHoldCoroutine();
     }
 
     private void Start()
@@ -41,11 +55,16 @@ public class TankAttackController : MonoBehaviour
 
     #region ROTATE
 
-    public void RotateCannon(float rotationAngle)
+    public void RotateTurret(float rotationAngle)
     {
-        Vector3 lerpedRotation = CannonTransform.eulerAngles;
-        lerpedRotation.y = Mathf.MoveTowardsAngle(lerpedRotation.y, rotationAngle, _cannonRotationSpeed);
-        CannonTransform.eulerAngles = lerpedRotation;
+        if (_onRotationHold)
+        {
+            return;
+        }
+
+        Vector3 lerpedRotation = TurretTransform.eulerAngles;
+        lerpedRotation.y = Mathf.MoveTowardsAngle(lerpedRotation.y, rotationAngle, _turretRotationSpeed);
+        TurretTransform.eulerAngles = lerpedRotation;
     }
 
     #endregion
@@ -61,7 +80,15 @@ public class TankAttackController : MonoBehaviour
 
         DoAttack();
 
-        _attackIntervalCoroutine = StartCoroutine(AttackWait());
+        if (_attackIntervalTime > 0)
+        {
+            _attackIntervalCoroutine = StartCoroutine(AttackWait());
+        }
+
+        if (_rotationHoldDuration > 0)
+        {
+            _rotationHoldCoroutine = StartCoroutine(RotationHoldWait());
+        }
     }
 
     private void DoAttack()
@@ -88,6 +115,17 @@ public class TankAttackController : MonoBehaviour
         KillAttackCoroutine();
     }
 
+    private IEnumerator RotationHoldWait()
+    {
+        _onRotationHold = true;
+
+        yield return new WaitForSeconds(_rotationHoldDuration);
+
+        _onRotationHold = false;
+
+        KillRotationHoldCoroutine();
+    }
+
     private void KillAttackCoroutine()
     {
         if (_attackIntervalCoroutine == null)
@@ -97,6 +135,17 @@ public class TankAttackController : MonoBehaviour
 
         StopCoroutine(_attackIntervalCoroutine);
         _attackIntervalCoroutine = null;
+    }
+
+    private void KillRotationHoldCoroutine()
+    {
+        if (_rotationHoldCoroutine == null)
+        {
+            return;
+        }
+
+        StopCoroutine(_rotationHoldCoroutine);
+        _rotationHoldCoroutine = null;
     }
 
     #endregion

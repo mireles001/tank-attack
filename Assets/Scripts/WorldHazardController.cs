@@ -33,6 +33,6 @@ public class WorldHazardController : MonoBehaviour
             return;
         }
 
-        destructibleObject.ApplyDamage(_isInstaDeath ? destructibleObject.GetMaxHealth() : _damage);
+        destructibleObject.ApplyDamage(_isInstaDeath ? destructibleObject.GetMaxHealth() : _damage, _isInstaDeath);
     }
 }

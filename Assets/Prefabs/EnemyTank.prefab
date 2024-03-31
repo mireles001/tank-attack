@@ -160,7 +160,7 @@ GameObject:
   - component: {fileID: 8995290391197422456}
   - component: {fileID: 79617832399082107}
   m_Layer: 0
-  m_Name: Cannon
+  m_Name: Turret
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -513,6 +513,10 @@ MonoBehaviour:
   _movementController: {fileID: 4795787386397370882}
   _attackController: {fileID: 7490073106679356724}
   _aggroController: {fileID: 6446729972273109116}
+  _ignoreBlockedLineOfSight: 1
+  _lineOfSightBoxHalfExtents: {x: 0.3, y: 0.2, z: 0.2}
+  _moveToDistance: 2
+  _moveToMaxRadius: 1
   _onDestroyEvents:
     m_PersistentCalls:
       m_Calls:
@@ -556,11 +560,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _movementSpeed: 3
-  _rotationSpeed: 0.25
-  _boostLimit: 0
-  _boostGainSpeed: 0
-  _boostLoseSpeed: 0
-  _boostFx: {fileID: 0}
+  _rotationSpeed: 0.2
 --- !u!114 &7490073106679356724
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -576,9 +576,10 @@ MonoBehaviour:
   _projectileSpawner: {fileID: 715083691303701888}
   _projectile: {fileID: 275651624632095003, guid: 9e0de26cff16edc478d21f46d81806d5, type: 3}
   _attackIntervalTime: 1
+  _rotationHoldDuration: 0.5
   _attackFx: {fileID: 0}
-  _cannonTransform: {fileID: 7451350675746229427}
-  _cannonRotationSpeed: 3
+  _turretTransform: {fileID: 7451350675746229427}
+  _turretRotationSpeed: 0.75
 --- !u!114 &6446729972273109116
 MonoBehaviour:
   m_ObjectHideFlags: 0

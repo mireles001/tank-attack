@@ -74,9 +74,9 @@ public class TankHealthController : MonoBehaviour, IDestructible
         return gameObject.tag;
     }
 
-    public void ApplyDamage(int damage)
+    public void ApplyDamage(int damage, bool isInstakill = false)
     {
-        if (_isInvincible)
+        if (!isInstakill && _isInvincible)
         {
             return;
         }

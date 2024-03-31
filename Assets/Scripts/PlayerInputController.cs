@@ -6,6 +6,11 @@ public class PlayerInputController : BaseTankController
     {
         get
         {
+            if (_movementController == null)
+            {
+                return null;
+            }
+
             return _movementController.MovementTarget;
         }
     }
@@ -19,6 +24,18 @@ public class PlayerInputController : BaseTankController
             }
 
             return _forwardPoint;
+        }
+    }
+    private TankBoostMovementController BoostMovementController
+    {
+        get
+        {
+            if (_boostMovementController == null)
+            {
+                _boostMovementController = _movementController as TankBoostMovementController;
+            }
+
+            return _boostMovementController;
         }
     }
 
@@ -43,6 +60,7 @@ public class PlayerInputController : BaseTankController
     private Vector3 _forwardPoint;
     private Vector3 _forwardPointVelocity;
     private Vector3 _lookAtDirection;
+    private TankBoostMovementController _boostMovementController;
 
     #region LIFE_CYCLE
 
@@ -67,10 +85,10 @@ public class PlayerInputController : BaseTankController
             return;
         }
 
-        _movementController.IsHolding = Input.GetButton(_breakButton);
+        BoostMovementController.IsHolding = Input.GetButton(_breakButton);
         MoveTank(Time.deltaTime);
         Attack();
-        MoveCannon();
+        MoveTurret();
     }
 
     public void OnTriggerEnter(Collider other)
@@ -102,10 +120,10 @@ public class PlayerInputController : BaseTankController
             return;
         }
 
-        _movementController.Move(Mathf.Max(Mathf.Abs(direction.x), Mathf.Abs(direction.z)) * timeDelta, timeDelta);
+        BoostMovementController.Move(Mathf.Max(Mathf.Abs(direction.x), Mathf.Abs(direction.z)) * timeDelta, timeDelta);
 
         float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg + _camera.transform.eulerAngles.y;
-        _movementController.Rotate(targetAngle);
+        BoostMovementController.Rotate(targetAngle);
     }
 
     private void MoveForwardPointGoToPosition(Vector3 direction)
@@ -124,6 +142,11 @@ public class PlayerInputController : BaseTankController
 
     private void Attack()
     {
+        if (_attackController.OnCoolDown)
+        {
+            return;
+        }
+
         bool attackInput = Input.GetButton(_attackButton);
 
         if (!attackInput)
@@ -139,9 +162,9 @@ public class PlayerInputController : BaseTankController
         _attackController.Attack();
     }
 
-    private void MoveCannon()
+    private void MoveTurret()
     {
-        Vector3 targetCurrentLookAtDirection = _attackController.CannonTransform.forward * LOOK_AT_DISTANCE;
+        Vector3 targetCurrentLookAtDirection = _attackController.TurretTransform.forward * LOOK_AT_DISTANCE;
 
         Vector3 mouseInput = Input.mousePosition;
         Vector3 joystickInput = new Vector3(Input.GetAxis(_rightStickHorizontalAxis), 0, Input.GetAxis(_rightStickVerticalAxis));
@@ -174,7 +197,7 @@ public class PlayerInputController : BaseTankController
 
         float targetAngle = Mathf.Atan2(_lookAtDirection.x, _lookAtDirection.z) * Mathf.Rad2Deg;
 
-        _attackController.RotateCannon(targetAngle);
+        _attackController.RotateTurret(targetAngle);
     }
 
     private void SetInputType(Vector3 mouse, Vector3 joystick)

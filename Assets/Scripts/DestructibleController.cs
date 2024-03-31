@@ -42,7 +42,7 @@ public class DestructibleController : MonoBehaviour, IDestructible
         return _hitPoints;
     }
 
-    public void ApplyDamage(int damage) {
+    public void ApplyDamage(int damage, bool isInstaKill = false) {
         _currentHitPoints = Mathf.Max(0, _currentHitPoints - damage);
 
         if (_currentHitPoints == 0)

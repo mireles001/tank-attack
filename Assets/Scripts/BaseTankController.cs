@@ -5,7 +5,7 @@ public class BaseTankController : MonoBehaviour
 {
     [SerializeField] protected TankHealthController _healthController;
     [SerializeField] protected TankMovementController _movementController;
-    [SerializeField] protected TankAttackController _attackController;
+    [SerializeField] protected TurretAttackController _attackController;
 
     protected bool _isAlive;
 

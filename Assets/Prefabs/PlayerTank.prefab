@@ -271,7 +271,7 @@ GameObject:
   - component: {fileID: 3101812444998493387}
   - component: {fileID: 7517388311268229957}
   m_Layer: 0
-  m_Name: Cannon
+  m_Name: Turret
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -645,7 +645,7 @@ GameObject:
   - component: {fileID: 1417725066033672089}
   - component: {fileID: 2358089780026936927}
   - component: {fileID: 3678944269568785357}
-  - component: {fileID: 3224486284363284495}
+  - component: {fileID: 3393391636562882624}
   - component: {fileID: 5204333384996036154}
   m_Layer: 0
   m_Name: PlayerTank
@@ -734,7 +734,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _healthController: {fileID: 3678944269568785357}
-  _movementController: {fileID: 3224486284363284495}
+  _movementController: {fileID: 3393391636562882624}
   _attackController: {fileID: 5204333384996036154}
   _camera: {fileID: 0}
   _forwardPointhDistance: 2.5
@@ -760,7 +760,7 @@ MonoBehaviour:
   _maxHealth: 10
   _invincibilityDuration: 1.5
   _tankDestroyedFx: {fileID: 0}
---- !u!114 &3224486284363284495
+--- !u!114 &3393391636562882624
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -769,11 +769,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 8949582602054071991}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f97c3bf4e8e0daf4b871a05268247a77, type: 3}
+  m_Script: {fileID: 11500000, guid: ad61a8ef86edb5740859450a8f83f5f3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _movementSpeed: 4
-  _rotationSpeed: 0.25
+  _rotationSpeed: 0.3
   _boostLimit: 4
   _boostGainSpeed: 4
   _boostLoseSpeed: 6.5
@@ -792,7 +792,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _projectileSpawner: {fileID: 6181683910056717968}
   _projectile: {fileID: 275651624632095003, guid: 9e0de26cff16edc478d21f46d81806d5, type: 3}
-  _attackIntervalTime: 0.33
+  _attackIntervalTime: 0.35
+  _rotationHoldDuration: 0.1
   _attackFx: {fileID: 0}
-  _cannonTransform: {fileID: 1616168242589198151}
-  _cannonRotationSpeed: 3.5
+  _turretTransform: {fileID: 1616168242589198151}
+  _turretRotationSpeed: 3.75
