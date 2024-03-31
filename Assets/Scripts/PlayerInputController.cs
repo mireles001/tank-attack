@@ -62,7 +62,7 @@ public class PlayerInputController : BaseTankController
 
     private void Update()
     {
-        if (!_isAlive || (LevelManager.Instance != null && LevelManager.Instance.IsPlayerInputLocked))
+        if (!_isAlive || (LevelManager.Instance != null && !LevelManager.Instance.ActiveGameplay))
         {
             return;
         }
@@ -81,7 +81,7 @@ public class PlayerInputController : BaseTankController
         }
 
         LevelExitController exit = other.gameObject.GetComponent<LevelExitController>();
-        if (LevelManager.Instance != null && !LevelManager.Instance.IsPlayerInputLocked && exit != null && !exit.IsLocked)
+        if (LevelManager.Instance != null && LevelManager.Instance.ActiveGameplay && exit != null && !exit.IsLocked)
         {
             LevelManager.Instance.End();
         }

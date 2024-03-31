@@ -35,11 +35,16 @@ public class EnemyController : BaseTankController
         LevelManager.Instance.LevelStart += OnLevelStart;
         LevelManager.Instance.LevelEnd += OnLevelEnd;
         LevelManager.Instance.PlayerDefeat += OnPlayerDefeat;
+
+        if (LevelManager.Instance.ActiveGameplay)
+        {
+            _aggroController.SetIgnoreDestructible(new IDestructible[] { _healthController }).FirstAggroCheckTic();
+        }
     }
 
     private void OnLevelStart()
     {
-        _aggroController.OnLevelStart(_healthController);
+        _aggroController.SetIgnoreDestructible(new IDestructible[] { _healthController }).FirstAggroCheckTic();
     }
 
     private void OnLevelEnd()

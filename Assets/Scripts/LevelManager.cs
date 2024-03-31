@@ -27,11 +27,11 @@ public class LevelManager : MonoBehaviour
     public event Action LevelEnd;
     public event Action PlayerDefeat;
 
-    public bool IsPlayerInputLocked
+    public bool ActiveGameplay
     {
         get
         {
-            return !_activeGameplay;
+            return _activeGameplay;
         }
     }
 

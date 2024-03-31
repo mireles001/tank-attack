@@ -594,6 +594,10 @@ MonoBehaviour:
   _aggroCheckSource: {fileID: 8229688176202390051}
   _aggroCheckOffset: {x: 0, y: 0, z: 2.5}
   _aggroCheckRadius: 4
+  _lockOnTarget: 0
+  _targetPlayer: 1
+  _targetEnemies: 0
+  _targetOthers: 0
 --- !u!114 &2097366318522165104
 MonoBehaviour:
   m_ObjectHideFlags: 0
