@@ -512,11 +512,10 @@ MonoBehaviour:
   _healthController: {fileID: 3141685104553976928}
   _movementController: {fileID: 4795787386397370882}
   _attackController: {fileID: 7490073106679356724}
+  _moveToDistance: 2.5
   _aggroController: {fileID: 6446729972273109116}
-  _ignoreBlockedLineOfSight: 1
   _lineOfSightBoxHalfExtents: {x: 0.3, y: 0.2, z: 0.2}
-  _moveToDistance: 2
-  _moveToMaxRadius: 1
+  _ignoreBlockedLineOfSight: 1
   _onDestroyEvents:
     m_PersistentCalls:
       m_Calls:
@@ -559,8 +558,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f97c3bf4e8e0daf4b871a05268247a77, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _movementSpeed: 3
-  _rotationSpeed: 0.2
+  _movementSpeed: 0.75
+  _rotationSpeed: 0.1
 --- !u!114 &7490073106679356724
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -574,9 +573,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _projectileSpawner: {fileID: 715083691303701888}
-  _projectile: {fileID: 275651624632095003, guid: 9e0de26cff16edc478d21f46d81806d5, type: 3}
-  _attackIntervalTime: 1
-  _rotationHoldDuration: 0.5
+  _projectile: {fileID: 275651624632095003, guid: 3a801b554193dfa4da98699b623f910c, type: 3}
+  _attackIntervalTime: 1.25
+  _rotationHoldDuration: 0.4
   _attackFx: {fileID: 0}
   _turretTransform: {fileID: 7451350675746229427}
   _turretRotationSpeed: 0.75

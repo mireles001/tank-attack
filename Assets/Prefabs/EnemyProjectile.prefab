@@ -28,7 +28,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.25, y: 0.3, z: 0.25}
+  m_LocalScale: {x: 0.2, y: 0.225, z: 0.2}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2652353855170176097}
@@ -98,7 +98,7 @@ GameObject:
   - component: {fileID: -3610830040514965524}
   - component: {fileID: 275651624632095003}
   m_Layer: 0
-  m_Name: ProjectilePrefab
+  m_Name: EnemyProjectile
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -139,8 +139,8 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 0.25
-  m_Center: {x: 0, y: 0, z: 0.05}
+  m_Radius: 0.1
+  m_Center: {x: 0, y: 0, z: 0.1}
 --- !u!54 &-3610830040514965524
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -182,7 +182,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _projectileCollider: {fileID: 1602351897168571797}
   _projectileDamage: 1
-  _projectileSpeed: 18
-  _autoDestroyTimer: 2
+  _projectileSpeed: 10
+  _autoDestroyTimer: 3
   _impactFx: {fileID: 0}
   _ignoreOtherProjectiles: 1

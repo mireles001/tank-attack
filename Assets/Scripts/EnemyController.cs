@@ -5,7 +5,6 @@ public class EnemyController : BaseTankController
 {
     [Header("Enemy movement variables")]
     [SerializeField] private float _moveToDistance;
-    [SerializeField] private float _moveToMaxRadius;
     [Header("Enemy attack variables")]
     [SerializeField] private AggroController _aggroController;
     [Tooltip("BoxCast halved dimension to validate if turret is aimgin to target")]
@@ -62,7 +61,7 @@ public class EnemyController : BaseTankController
         }
 
         _isTargetInSight = CheckLineOfSight(_attackController.TurretTransform, _aggroController.AggroTarget, _lineOfSightBoxHalfExtents, _ignoreBlockedLineOfSight);
-        Move();
+        Move(Time.deltaTime);
         Attack();
         MoveTurret();
     }
@@ -89,7 +88,9 @@ public class EnemyController : BaseTankController
         Destroy(gameObject);
     }
 
-    private void Move()
+    private Vector3 _goTo;
+
+    private void Move(float timeDelta)
     {
         if (_aggroController.AggroTarget == null)
         {
@@ -97,14 +98,35 @@ public class EnemyController : BaseTankController
         }
         else
         {
+            bool updatePosition = false;
             float targetDistance = Vector3.Distance(transform.position, _aggroController.AggroTarget.position);
             float maxDistance = Mathf.Abs(_moveToDistance);
-            float maxRadius = Mathf.Abs(_moveToMaxRadius);
-            if (targetDistance > maxDistance + maxRadius)
+            if (targetDistance > maxDistance)
             {
-                //Debug.Log("Away");
+                Vector3 goToDirection = (_aggroController.AggroTarget.position - _movementController.MovementTarget.position).normalized;
+                _goTo = goToDirection * _moveToDistance + _movementController.MovementTarget.position;
+                updatePosition = true;
+            }
+            else
+            {
+                _goTo = _aggroController.AggroTarget.position;
+            }
+
+            if (updatePosition)
+            {
+                MoveTank(timeDelta);
             }
         }
+    }
+
+    private void MoveTank(float timeDelta)
+    {
+        Vector3 direction = _goTo - _movementController.MovementTarget.position;
+
+        _movementController.Move(Mathf.Max(Mathf.Abs(direction.x), Mathf.Abs(direction.z)) * timeDelta);
+
+        float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;
+        _movementController.Rotate(targetAngle);
     }
 
     private void Attack()
@@ -164,4 +186,19 @@ public class EnemyController : BaseTankController
 
         return result;
     }
+
+#if UNITY_EDITOR
+
+    private void OnDrawGizmos()
+    {
+        if (_aggroController.AggroTarget == null)
+        {
+            return;
+        }
+
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(_goTo, 0.25f);
+    }
+
+#endif
 }
