@@ -1,26 +1,51 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
 
 public class EnemyController : BaseTankController
 {
     [Header("Enemy movement variables")]
-    [SerializeField] private float _moveToDistance;
+    [SerializeField] private float _aggroMovementMultiplier = 1f;
+    [SerializeField] private float _aggressiveGoToDistance;
+    [SerializeField] private float _lostTargetWaitTime;
+    [SerializeField] private float _patrolMoveMaxDistance;
+    [SerializeField] private Vector2 _patrolMoveIntervalRange;
     [Header("Enemy attack variables")]
     [SerializeField] private AggroController _aggroController;
     [Tooltip("BoxCast halved dimension to validate if turret is aimgin to target")]
     [SerializeField] private Vector3 _lineOfSightBoxHalfExtents;
     [SerializeField] private bool _ignoreBlockedLineOfSight;
+    [Header("On Damage")]
+    [SerializeField] private float _aggroRangeDuration;
+    [SerializeField] private float _aggroRangeMultiplier = 1f;
 
     [Space, Header("Execute events on destroy"), Space]
     [SerializeField] private UnityEvent _onDestroyEvents;
 
+    private readonly float MIN_DISTANCE_CHECK = 0.1f;
+
+    private bool _isPatrolIntervalActive;
     private bool _isTargetInSight;
+    private float _aggroCheckRadius;
+    private Vector3 _goTo;
+    private Coroutine _aggroRangeOnDamageCoroutine;
+    private Coroutine _lostTargetWaitCoroutine;
+    private Coroutine _patrolIntervalCoroutine;
 
     #region LIFE_CYCLE
 
     protected override void OnDisable()
     {
         base.OnDisable();
+
+        if (_healthController != null)
+        {
+            _healthController.TankHealthModified -= OnDamaged;
+        }
+
+        KillAggroRangeOnDamageCoroutine();
+        KillPatrolIntervalCoroutine();
+        KillLostTargetCoroutine();
 
         if (LevelManager.Instance == null)
         {
@@ -36,6 +61,16 @@ public class EnemyController : BaseTankController
     protected override void Start()
     {
         base.Start();
+
+        if (_healthController != null)
+        {
+            _healthController.TankHealthModified += OnDamaged;
+        }
+
+        if (_aggroController != null)
+        {
+            _aggroCheckRadius = _aggroController.AggroCheckRadius;
+        }
 
         if (LevelManager.Instance == null)
         {
@@ -80,6 +115,19 @@ public class EnemyController : BaseTankController
 
     private void OnPlayerDefeat() { }
 
+    private void OnDamaged()
+    {
+        if (_aggroController == null || _aggroRangeDuration <= 0)
+        {
+            return;
+        }
+
+        _aggroController.SetAggroCheckRadius(_aggroCheckRadius * _aggroRangeMultiplier).AggroCheckTic();
+
+        _aggroRangeOnDamageCoroutine = StartCoroutine(AggroRangeOnDamageDuration());
+
+    }
+
     protected override void OnTankDestroyed()
     {
         base.OnTankDestroyed();
@@ -88,42 +136,62 @@ public class EnemyController : BaseTankController
         Destroy(gameObject);
     }
 
-    private Vector3 _goTo;
-
     private void Move(float timeDelta)
     {
+        bool updatePosition = false;
+
         if (_aggroController.AggroTarget == null)
         {
-
-        }
-        else
-        {
-            bool updatePosition = false;
-            float targetDistance = Vector3.Distance(transform.position, _aggroController.AggroTarget.position);
-            float maxDistance = Mathf.Abs(_moveToDistance);
-            if (targetDistance > maxDistance)
+            if (_lostTargetWaitCoroutine != null)
             {
-                Vector3 goToDirection = (_aggroController.AggroTarget.position - _movementController.MovementTarget.position).normalized;
-                _goTo = goToDirection * _moveToDistance + _movementController.MovementTarget.position;
-                updatePosition = true;
+                updatePosition = Vector3.Distance(_goTo, _movementController.MovementTarget.position) > MIN_DISTANCE_CHECK;
             }
             else
             {
-                _goTo = _aggroController.AggroTarget.position;
+                if (!_isPatrolIntervalActive)
+                {
+                    _patrolIntervalCoroutine = StartCoroutine(PatrolIntervalWait());
+                    Vector2 randomPositionRaw = Random.insideUnitCircle * _patrolMoveMaxDistance;
+                    _goTo = new Vector3(randomPositionRaw.x, 0, randomPositionRaw.y) + _movementController.MovementTarget.position;
+                }
+
+                updatePosition = _isPatrolIntervalActive && Vector3.Distance(_goTo, _movementController.MovementTarget.position) > MIN_DISTANCE_CHECK;
+            }
+        }
+        else
+        {
+            KillPatrolIntervalCoroutine();
+
+            float targetDistance = Vector3.Distance(_movementController.MovementTarget.position, _aggroController.AggroTarget.position);
+            float maxDistance = Mathf.Abs(_aggressiveGoToDistance);
+            if (targetDistance > maxDistance)
+            {
+                Vector3 goToDirection = (_aggroController.AggroTarget.position - _movementController.MovementTarget.position).normalized;
+                _goTo = goToDirection * _aggressiveGoToDistance + _movementController.MovementTarget.position;
+                updatePosition = true;
             }
 
-            if (updatePosition)
-            {
-                MoveTank(timeDelta);
-            }
+            KillLostTargetCoroutine();
+            _lostTargetWaitCoroutine = StartCoroutine(LostTargetWait());
+        }
+
+        if (updatePosition)
+        {
+            MoveTank(timeDelta);
         }
     }
 
     private void MoveTank(float timeDelta)
     {
-        Vector3 direction = _goTo - _movementController.MovementTarget.position;
+        Vector3 direction = (_goTo - _movementController.MovementTarget.position).normalized;
 
-        _movementController.Move(Mathf.Max(Mathf.Abs(direction.x), Mathf.Abs(direction.z)) * timeDelta);
+        float movementInput = Mathf.Max(Mathf.Abs(direction.x), Mathf.Abs(direction.z)) * timeDelta;
+
+        if (_lostTargetWaitCoroutine != null)
+        {
+            movementInput *= _aggroMovementMultiplier;
+        }
+        _movementController.Move(movementInput);
 
         float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;
         _movementController.Rotate(targetAngle);
@@ -149,6 +217,62 @@ public class EnemyController : BaseTankController
         Vector3 lookAtDirection = _aggroController.AggroTarget.position - _movementController.MovementTarget.position;
         float targetAngle = Mathf.Atan2(lookAtDirection.x, lookAtDirection.z) * Mathf.Rad2Deg;
         _attackController.RotateTurret(targetAngle);
+    }
+
+    private IEnumerator AggroRangeOnDamageDuration()
+    {
+        yield return new WaitForSeconds(_aggroRangeDuration);
+
+        _aggroController.SetAggroCheckRadius(_aggroCheckRadius);
+        KillAggroRangeOnDamageCoroutine();
+    }
+
+    private void KillAggroRangeOnDamageCoroutine()
+    {
+        if (_aggroRangeOnDamageCoroutine == null)
+        {
+            return;
+        }
+
+        StopCoroutine(_aggroRangeOnDamageCoroutine);
+        _aggroRangeOnDamageCoroutine = null;
+    }
+
+    private IEnumerator PatrolIntervalWait()
+    {
+        _isPatrolIntervalActive = true;
+        yield return new WaitForSeconds(Random.Range(_patrolMoveIntervalRange.x, _patrolMoveIntervalRange.y));
+        KillPatrolIntervalCoroutine();
+    }
+
+    private void KillPatrolIntervalCoroutine()
+    {
+        _isPatrolIntervalActive = false;
+
+        if (_patrolIntervalCoroutine == null)
+        {
+            return;
+        }
+
+        StopCoroutine(_patrolIntervalCoroutine);
+        _patrolIntervalCoroutine = null;
+    }
+
+    private IEnumerator LostTargetWait()
+    {
+        yield return new WaitForSeconds(_lostTargetWaitTime);
+        KillLostTargetCoroutine();
+    }
+
+    private void KillLostTargetCoroutine()
+    {
+        if (_lostTargetWaitCoroutine == null)
+        {
+            return;
+        }
+
+        StopCoroutine(_lostTargetWaitCoroutine);
+        _lostTargetWaitCoroutine = null;
     }
 
     private static bool CheckLineOfSight(Transform source, Transform target, Vector3 halfExtents, bool ignoreBlocked)
@@ -191,12 +315,7 @@ public class EnemyController : BaseTankController
 
     private void OnDrawGizmos()
     {
-        if (_aggroController.AggroTarget == null)
-        {
-            return;
-        }
-
-        Gizmos.color = Color.red;
+        Gizmos.color = _aggroController.AggroTarget == null ? Color.green : Color.red;
         Gizmos.DrawWireSphere(_goTo, 0.25f);
     }
 

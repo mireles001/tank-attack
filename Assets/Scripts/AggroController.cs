@@ -7,6 +7,13 @@ using UnityEngine;
 
 public class AggroController : MonoBehaviour
 {
+    public float AggroCheckRadius
+    {
+        get
+        {
+            return _aggroCheckRadius;
+        }
+    }
     public Transform AggroTarget
     {
         get
@@ -57,7 +64,13 @@ public class AggroController : MonoBehaviour
         _aggroCheckTic = StartCoroutine(AggroCheckWait(UnityEngine.Random.Range(0, CHECK_TIC_TIMER) + 0.1f));
     }
 
-    private void AggroCheckTic()
+    public AggroController SetAggroCheckRadius(float aggroCheckRadius)
+    {
+        _aggroCheckRadius = aggroCheckRadius;
+        return this;
+    }
+
+    public void AggroCheckTic()
     {
         KillAggroCheck();
         AggroCheck();
