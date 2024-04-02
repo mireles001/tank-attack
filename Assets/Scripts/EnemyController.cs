@@ -10,6 +10,8 @@ public class EnemyController : BaseTankController
     [SerializeField] private float _lostTargetWaitTime;
     [SerializeField] private float _patrolMoveMaxDistance;
     [SerializeField] private Vector2 _patrolMoveIntervalRange;
+    [SerializeField] private float _forwardCheckDistance;
+    [SerializeField] private Vector3 _forwardCheckOffset;
     [Header("Enemy attack variables")]
     [SerializeField] private AggroController _aggroController;
     [Tooltip("BoxCast halved dimension to validate if turret is aimgin to target")]
@@ -148,14 +150,28 @@ public class EnemyController : BaseTankController
             }
             else
             {
+                Transform target = _movementController.MovementTarget;
                 if (!_isPatrolIntervalActive)
                 {
                     _patrolIntervalCoroutine = StartCoroutine(PatrolIntervalWait());
                     Vector2 randomPositionRaw = Random.insideUnitCircle * _patrolMoveMaxDistance;
-                    _goTo = new Vector3(randomPositionRaw.x, 0, randomPositionRaw.y) + _movementController.MovementTarget.position;
+                    _goTo = new Vector3(randomPositionRaw.x, 0, randomPositionRaw.y) + target.position;
                 }
 
-                updatePosition = _isPatrolIntervalActive && Vector3.Distance(_goTo, _movementController.MovementTarget.position) > MIN_DISTANCE_CHECK;
+                updatePosition = _isPatrolIntervalActive && Vector3.Distance(_goTo, target.position) > MIN_DISTANCE_CHECK;
+
+                Vector3 forwardCheckOrigin = GetForwardCheckOrigin(target, _forwardCheckOffset);
+                if (Physics.Raycast(forwardCheckOrigin, target.forward, out RaycastHit hit, _forwardCheckDistance))
+                {
+                    updatePosition = hit.collider.isTrigger;
+                    // TODO: Get if goTo is behind
+                    //if (!updatePosition)
+                    //{
+                    //    Vector3 goToRelativeDirection = (_goTo - target.position).normalized;
+                    //    float targetAngle = Mathf.Atan2(goToRelativeDirection.x, goToRelativeDirection.z) * Mathf.Rad2Deg + target.eulerAngles.y;
+                    //    Debug.Log(targetAngle);
+                    //}
+                }
             }
         }
         else
@@ -311,12 +327,27 @@ public class EnemyController : BaseTankController
         return result;
     }
 
+    private static Vector3 GetForwardCheckOrigin(Transform origin, Vector3 offset)
+    {
+        return origin.right * offset.x + origin.up * offset.y + origin.forward * offset.z + origin.position;
+    }
+
 #if UNITY_EDITOR
 
     private void OnDrawGizmos()
     {
         Gizmos.color = _aggroController.AggroTarget == null ? Color.green : Color.red;
         Gizmos.DrawWireSphere(_goTo, 0.25f);
+
+        if (_aggroController.AggroTarget != null)
+        {
+            return;
+        }
+
+        Transform target = _movementController.MovementTarget;
+        Vector3 origin = GetForwardCheckOrigin(target, _forwardCheckOffset);
+        Gizmos.color = Color.magenta;
+        Gizmos.DrawLine(origin, origin + target.forward * _forwardCheckDistance);
     }
 
 #endif

@@ -517,6 +517,8 @@ MonoBehaviour:
   _lostTargetWaitTime: 3
   _patrolMoveMaxDistance: 6
   _patrolMoveIntervalRange: {x: 3, y: 6}
+  _forwardCheckDistance: 1
+  _forwardCheckOffset: {x: 0, y: 0.35, z: 0.25}
   _aggroController: {fileID: 6446729972273109116}
   _lineOfSightBoxHalfExtents: {x: 0.3, y: 0.2, z: 0.2}
   _ignoreBlockedLineOfSight: 1
