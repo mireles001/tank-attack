@@ -3,7 +3,7 @@ using UnityEngine;
 [DisallowMultipleComponent]
 public class BaseTankController : MonoBehaviour
 {
-    [SerializeField] protected TankHealthController _healthController;
+    [SerializeField] protected HealthController _healthController;
     [SerializeField] protected TankMovementController _movementController;
     [SerializeField] protected TurretAttackController _attackController;
 

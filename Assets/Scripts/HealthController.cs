@@ -3,7 +3,7 @@ using System.Collections;
 using UnityEngine;
 
 [DisallowMultipleComponent]
-public class TankHealthController : MonoBehaviour, IDestructible
+public class HealthController : MonoBehaviour, IDestructible
 {
     public event Action TankHealthModified;
     public event Action TankDestroyed;

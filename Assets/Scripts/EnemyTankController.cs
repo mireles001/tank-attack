@@ -2,7 +2,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
 
-public class EnemyController : BaseTankController
+public class EnemyTankController : BaseTankController
 {
     [Header("Patroling (Non-aggressive)")]
     [SerializeField] private float _patrolingMaxDistance;
@@ -33,7 +33,6 @@ public class EnemyController : BaseTankController
     private bool _isPatroling;
     private bool _isTargetInSight;
     private float _aggroCheckRadius;
-    
     private Vector3 _goTo;
     private Coroutine _onDamagedCoroutine;
     private Coroutine _resetAggroCoroutine;
