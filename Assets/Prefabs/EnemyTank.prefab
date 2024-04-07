@@ -512,18 +512,18 @@ MonoBehaviour:
   _healthController: {fileID: 3141685104553976928}
   _movementController: {fileID: 4795787386397370882}
   _attackController: {fileID: 7490073106679356724}
-  _aggroMovementMultiplier: 1.75
-  _aggressiveGoToDistance: 2.5
-  _lostTargetWaitTime: 3
-  _patrolMoveMaxDistance: 6
-  _patrolMoveIntervalRange: {x: 3, y: 6}
+  _patrolingMaxDistance: 6
+  _patrolingIntervalRange: {x: 3, y: 6}
   _forwardCheckDistance: 1
+  _forwardCheckAngleTolerance: 45
   _forwardCheckOffset: {x: 0, y: 0.35, z: 0.25}
   _aggroController: {fileID: 6446729972273109116}
-  _lineOfSightBoxHalfExtents: {x: 0.3, y: 0.2, z: 0.2}
-  _ignoreBlockedLineOfSight: 1
-  _aggroRangeDuration: 2
+  _attackThrought: 0
+  _aggroMovementMultiplier: 1.75
+  _aggroGoToDistance: 2.5
+  _resetAggroWaitTime: 3
   _aggroRangeMultiplier: 3
+  _aggroRangeDuration: 2
   _onDestroyEvents:
     m_PersistentCalls:
       m_Calls:
