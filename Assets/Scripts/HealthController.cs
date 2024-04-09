@@ -5,13 +5,13 @@ using UnityEngine;
 [DisallowMultipleComponent]
 public class HealthController : MonoBehaviour, IDestructible
 {
-    public event Action TankHealthModified;
-    public event Action TankDestroyed;
+    public event Action HealthModified;
+    public event Action HealthDepleted;
 
     [SerializeField] private int _maxHealth;
     [SerializeField] private float _invincibilityDuration;
     [Header("Visual FXs")]
-    [SerializeField] private ParticleSystem _tankDestroyedFx;
+    [SerializeField] private ParticleSystem _destroyedFx;
 
     private int _health;
     private bool _isInvincible;
@@ -82,7 +82,7 @@ public class HealthController : MonoBehaviour, IDestructible
         }
 
         _health = Mathf.Max(0, _health - damage);
-        TankHealthModified?.Invoke();
+        HealthModified?.Invoke();
 
         if (_health > 0)
         {
@@ -94,12 +94,12 @@ public class HealthController : MonoBehaviour, IDestructible
         }
         else
         {
-            if (_tankDestroyedFx != null)
+            if (_destroyedFx != null)
             {
-                Instantiate(_tankDestroyedFx).transform.SetPositionAndRotation(transform.position, transform.rotation);
+                Instantiate(_destroyedFx).transform.SetPositionAndRotation(transform.position, transform.rotation);
             }
 
-            TankDestroyed?.Invoke();
+            HealthDepleted?.Invoke();
         }
     }
 

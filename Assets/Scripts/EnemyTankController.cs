@@ -58,7 +58,7 @@ public class EnemyTankController : BaseTankController
 
         if (_healthController != null)
         {
-            _healthController.TankHealthModified -= OnDamaged;
+            _healthController.HealthModified -= OnDamaged;
         }
     }
 
@@ -68,7 +68,7 @@ public class EnemyTankController : BaseTankController
 
         if (_healthController != null)
         {
-            _healthController.TankHealthModified += OnDamaged;
+            _healthController.HealthModified += OnDamaged;
         }
 
         if (_aggroController != null)
@@ -102,7 +102,7 @@ public class EnemyTankController : BaseTankController
         _isTargetInSight = CheckLineOfSight(_attackController.TurretTransform, _aggroController.AggroTarget, LOS_BOXCAST_HALF_EXTENDS, _attackThrought);
         MoveTank(Time.deltaTime);
         Attack();
-        MoveTurret();
+        MoveTurret(Time.deltaTime);
     }
 
     #endregion
@@ -232,16 +232,15 @@ public class EnemyTankController : BaseTankController
         _attackController.Attack();
     }
 
-    private void MoveTurret()
+    private void MoveTurret(float deltaTime)
     {
         if (_aggroController.AggroTarget == null)
         {
             return;
         }
 
-        Vector3 lookAtDirection = _aggroController.AggroTarget.position - _movementController.MovementTarget.position;
-        float targetAngle = Mathf.Atan2(lookAtDirection.x, lookAtDirection.z) * Mathf.Rad2Deg;
-        _attackController.RotateTurret(targetAngle);
+        Vector3 lookAtDirection = _aggroController.AggroTargetPosition - _movementController.MovementTarget.position;
+        _attackController.RotateTurret(lookAtDirection, deltaTime);
     }
 
     private IEnumerator OnDamagedWait()

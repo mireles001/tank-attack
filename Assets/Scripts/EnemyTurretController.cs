@@ -44,7 +44,8 @@ public class EnemyTurretController : MonoBehaviour
 
         if (_healthController != null)
         {
-            _healthController.TankHealthModified -= OnDamaged;
+            _healthController.HealthModified -= OnDamaged;
+            _healthController.HealthDepleted -= OnTurretDestroyed;
         }
     }
 
@@ -54,7 +55,8 @@ public class EnemyTurretController : MonoBehaviour
 
         if (_healthController != null)
         {
-            _healthController.TankHealthModified += OnDamaged;
+            _healthController.HealthModified += OnDamaged;
+            _healthController.HealthDepleted += OnTurretDestroyed;
         }
 
         if (_aggroController != null)
@@ -87,7 +89,7 @@ public class EnemyTurretController : MonoBehaviour
 
         _isTargetInSight = CheckLineOfSight(_attackController.TurretTransform, _aggroController.AggroTarget, LOS_BOXCAST_HALF_EXTENDS, _attackThrought);
         Attack();
-        MoveTurret();
+        MoveTurret(Time.deltaTime);
     }
 
     #endregion
@@ -99,7 +101,7 @@ public class EnemyTurretController : MonoBehaviour
 
     private void OnLevelEnd()
     {
-        OnTankDestroyed();
+        OnTurretDestroyed();
     }
 
     private void OnDamaged()
@@ -117,7 +119,7 @@ public class EnemyTurretController : MonoBehaviour
 
     private void OnPlayerDefeat() { }
 
-    private void OnTankDestroyed()
+    private void OnTurretDestroyed()
     {
         _isAlive = false;
         _onDestroyEvents?.Invoke();
@@ -134,16 +136,15 @@ public class EnemyTurretController : MonoBehaviour
         _attackController.Attack();
     }
 
-    private void MoveTurret()
+    private void MoveTurret(float deltaTime)
     {
         if (_aggroController.AggroTarget == null)
         {
             return;
         }
 
-        Vector3 lookAtDirection = _aggroController.AggroTarget.position - _attackController.TurretTransform.position;
-        float targetAngle = Mathf.Atan2(lookAtDirection.x, lookAtDirection.z) * Mathf.Rad2Deg;
-        _attackController.RotateTurret(targetAngle);
+        Vector3 lookAtDirection = _aggroController.AggroTargetPosition - _attackController.TurretTransform.position;
+        _attackController.RotateTurret(lookAtDirection, deltaTime);
     }
 
     private IEnumerator OnDamagedWait()

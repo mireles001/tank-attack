@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Threading;
 using UnityEngine;
 
 [DisallowMultipleComponent]
@@ -29,6 +30,8 @@ public class TurretAttackController : MonoBehaviour
     [SerializeField] private float _rotationHoldDuration;
     [SerializeField] private ParticleSystem _attackFx;
     [Header("Turret Movement")]
+    [SerializeField] private bool _rotateX;
+    [SerializeField] private bool _rotateY;
     [SerializeField] private Transform _turretTransform;
     [SerializeField] private float _turretRotationSpeed;
 
@@ -55,16 +58,25 @@ public class TurretAttackController : MonoBehaviour
 
     #region ROTATE
 
-    public void RotateTurret(float rotationAngle)
+    public void RotateTurret(Vector3 lookAtDirection, float deltaTime)
     {
         if (_onRotationHold)
         {
             return;
         }
 
-        Vector3 lerpedRotation = TurretTransform.eulerAngles;
-        lerpedRotation.y = Mathf.MoveTowardsAngle(lerpedRotation.y, rotationAngle, _turretRotationSpeed);
-        TurretTransform.eulerAngles = lerpedRotation;
+        Vector3 newRotation = TurretTransform.eulerAngles;
+        Vector3 lerpedRotation = Quaternion.Slerp(TurretTransform.rotation, Quaternion.LookRotation(lookAtDirection, Vector3.up), deltaTime * _turretRotationSpeed).eulerAngles;
+        if (_rotateX)
+        {
+            newRotation.x = lerpedRotation.x;
+        }
+        if (_rotateY)
+        {
+            newRotation.y = lerpedRotation.y;
+        }
+
+        TurretTransform.eulerAngles = newRotation;
     }
 
     #endregion

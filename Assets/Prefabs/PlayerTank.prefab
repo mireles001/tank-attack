@@ -645,7 +645,7 @@ GameObject:
   - component: {fileID: 1417725066033672089}
   - component: {fileID: 2358089780026936927}
   - component: {fileID: 3678944269568785357}
-  - component: {fileID: 3393391636562882624}
+  - component: {fileID: 6670727283768244350}
   - component: {fileID: 5204333384996036154}
   m_Layer: 0
   m_Name: PlayerTank
@@ -734,11 +734,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _healthController: {fileID: 3678944269568785357}
-  _movementController: {fileID: 3393391636562882624}
+  _movementController: {fileID: 6670727283768244350}
   _attackController: {fileID: 5204333384996036154}
   _camera: {fileID: 0}
   _forwardPointhDistance: 2.5
   _forwardPointhDamp: 0.3
+  _boostLimit: 1.25
+  _boostGainSpeed: 2
+  _boostLoseSpeed: 0.9
+  _boostFx: {fileID: 0}
   _horizontalAxis: Horizontal
   _verticalAxis: Vertical
   _attackButton: Attack
@@ -759,8 +763,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _maxHealth: 10
   _invincibilityDuration: 1.5
-  _tankDestroyedFx: {fileID: 0}
---- !u!114 &3393391636562882624
+  _destroyedFx: {fileID: 0}
+--- !u!114 &6670727283768244350
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -769,15 +773,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 8949582602054071991}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ad61a8ef86edb5740859450a8f83f5f3, type: 3}
+  m_Script: {fileID: 11500000, guid: f97c3bf4e8e0daf4b871a05268247a77, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _movementSpeed: 4
   _rotationSpeed: 0.3
-  _boostLimit: 4
-  _boostGainSpeed: 4
-  _boostLoseSpeed: 6.5
-  _boostFx: {fileID: 0}
 --- !u!114 &5204333384996036154
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -792,8 +792,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _projectileSpawner: {fileID: 6181683910056717968}
   _projectile: {fileID: 275651624632095003, guid: 9e0de26cff16edc478d21f46d81806d5, type: 3}
-  _attackIntervalTime: 0.35
+  _attackIntervalTime: 0.333
   _rotationHoldDuration: 0.1
   _attackFx: {fileID: 0}
+  _rotateX: 0
+  _rotateY: 1
   _turretTransform: {fileID: 1616168242589198151}
-  _turretRotationSpeed: 3.75
+  _turretRotationSpeed: 8

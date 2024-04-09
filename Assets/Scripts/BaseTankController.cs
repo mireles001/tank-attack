@@ -13,7 +13,7 @@ public class BaseTankController : MonoBehaviour
     {
         if (_healthController != null)
         {
-            _healthController.TankDestroyed -= OnTankDestroyed;
+            _healthController.HealthDepleted -= OnTankDestroyed;
         }
     }
 
@@ -26,7 +26,7 @@ public class BaseTankController : MonoBehaviour
     {
         if (_healthController != null)
         {
-            _healthController.TankDestroyed += OnTankDestroyed;
+            _healthController.HealthDepleted += OnTankDestroyed;
         }
     }
 

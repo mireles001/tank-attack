@@ -430,7 +430,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _maxHealth: 5
   _invincibilityDuration: 0.1
-  _tankDestroyedFx: {fileID: 0}
+  _destroyedFx: {fileID: 0}
 --- !u!114 &8533724668976303186
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -448,8 +448,10 @@ MonoBehaviour:
   _attackIntervalTime: 1.25
   _rotationHoldDuration: 0.4
   _attackFx: {fileID: 0}
+  _rotateX: 1
+  _rotateY: 1
   _turretTransform: {fileID: 5640165844787254802}
-  _turretRotationSpeed: 0.75
+  _turretRotationSpeed: 4
 --- !u!114 &6641917212474038472
 MonoBehaviour:
   m_ObjectHideFlags: 0

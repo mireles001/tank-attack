@@ -26,22 +26,16 @@ public class PlayerInputController : BaseTankController
             return _forwardPoint;
         }
     }
-    private TankBoostMovementController BoostMovementController
-    {
-        get
-        {
-            if (_boostMovementController == null)
-            {
-                _boostMovementController = _movementController as TankBoostMovementController;
-            }
-
-            return _boostMovementController;
-        }
-    }
 
     [SerializeField] private Camera _camera;
     [SerializeField] private float _forwardPointhDistance;
     [SerializeField] private float _forwardPointhDamp;
+    [Header("Speed Boost"), Tooltip("Move + (hold) Break to gain boost")]
+    [SerializeField] private float _boostLimit;
+    [SerializeField] private float _boostGainSpeed;
+    [SerializeField] private float _boostLoseSpeed;
+    [Header("Visual FX")]
+    [SerializeField] private ParticleSystem _boostFx;
     [Space, Header("Input Labels")]
     [SerializeField] private string _horizontalAxis = "Horizontal";
     [SerializeField] private string _verticalAxis = "Vertical";
@@ -53,14 +47,18 @@ public class PlayerInputController : BaseTankController
     private const float MIN_INPUT_AXIS_VALUE = 0.19f;
     private const float LOOK_AT_DISTANCE = 1.5f;
     private const float MOUSE_LOOK_DEATHZONE = 0.9f;
+    private const float USE_FX_MULTIPLIER = 0.666f;
+    private const float CAN_USE_FX_AGAIN_MULTIPLIER = 0.333f;
 
     private bool _isUsingJoystick;
     private bool _isCameraTargetFreezed;
+    private bool _canUseBoostFx;
+    private bool _isHolding;
+    private float _boostPower;
     private Vector3 _lastMouseInput;
     private Vector3 _forwardPoint;
     private Vector3 _forwardPointVelocity;
     private Vector3 _lookAtDirection;
-    private TankBoostMovementController _boostMovementController;
 
     #region LIFE_CYCLE
 
@@ -76,6 +74,8 @@ public class PlayerInputController : BaseTankController
         _forwardPointhDamp = Mathf.Max(0, _forwardPointhDamp);
 
         _lookAtDirection = MovementTarget.forward * LOOK_AT_DISTANCE;
+
+        _canUseBoostFx = true;
     }
 
     private void Update()
@@ -85,10 +85,30 @@ public class PlayerInputController : BaseTankController
             return;
         }
 
-        BoostMovementController.IsHolding = Input.GetButton(_breakButton);
+        _isHolding = Input.GetButton(_breakButton);
         MoveTank(Time.deltaTime);
         Attack();
-        MoveTurret();
+        MoveTurret(Time.deltaTime);
+    }
+
+    private void LateUpdate()
+    {
+        if (_isHolding)
+        {
+            return;
+        }
+
+        if (_boostPower <= 0 || _boostLoseSpeed <= 0 || _boostLimit <= 0)
+        {
+            return;
+        }
+
+        if (!_canUseBoostFx && _boostPower <= _boostLimit * CAN_USE_FX_AGAIN_MULTIPLIER)
+        {
+            _canUseBoostFx = true;
+        }
+
+        _boostPower = Mathf.Max(_boostPower - _boostLoseSpeed * Time.deltaTime, 0);
     }
 
     public void OnTriggerEnter(Collider other)
@@ -120,10 +140,47 @@ public class PlayerInputController : BaseTankController
             return;
         }
 
-        BoostMovementController.Move(Mathf.Max(Mathf.Abs(direction.x), Mathf.Abs(direction.z)) * timeDelta, timeDelta);
+        MovePosition(direction, timeDelta);
 
+        MoveRotation(direction);
+    }
+
+    private void MovePosition(Vector3 direction, float timeDelta)
+    {
+        if (_isHolding)
+        {
+            if (_boostGainSpeed <= 0 || _boostLimit <= 0 || timeDelta == 0)
+            {
+                return;
+            }
+
+            _boostPower = Mathf.Min(_boostPower + _boostGainSpeed * timeDelta, _boostLimit);
+            return;
+        }
+
+        if (_canUseBoostFx && _boostPower > _boostLimit * USE_FX_MULTIPLIER)
+        {
+            _canUseBoostFx = false;
+
+            if (_boostFx != null)
+            {
+                Instantiate(_boostFx).transform.SetPositionAndRotation(MovementTarget.position, MovementTarget.rotation);
+            }
+        }
+
+        float baseMoveInput = Mathf.Max(Mathf.Abs(direction.x), Mathf.Abs(direction.z));
+        if (_boostPower > 0)
+        {
+            baseMoveInput += _boostPower;
+        }
+
+        _movementController.Move(baseMoveInput * timeDelta);
+    }
+
+    private void MoveRotation(Vector3 direction)
+    {
         float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg + _camera.transform.eulerAngles.y;
-        BoostMovementController.Rotate(targetAngle);
+        _movementController.Rotate(targetAngle);
     }
 
     private void MoveForwardPointGoToPosition(Vector3 direction)
@@ -162,7 +219,7 @@ public class PlayerInputController : BaseTankController
         _attackController.Attack();
     }
 
-    private void MoveTurret()
+    private void MoveTurret(float deltaTime)
     {
         Vector3 targetCurrentLookAtDirection = _attackController.TurretTransform.forward * LOOK_AT_DISTANCE;
 
@@ -195,9 +252,7 @@ public class PlayerInputController : BaseTankController
             _lookAtDirection = validMousePosition ? mouseDirection : targetCurrentLookAtDirection;
         }
 
-        float targetAngle = Mathf.Atan2(_lookAtDirection.x, _lookAtDirection.z) * Mathf.Rad2Deg;
-
-        _attackController.RotateTurret(targetAngle);
+        _attackController.RotateTurret(_lookAtDirection, deltaTime);
     }
 
     private void SetInputType(Vector3 mouse, Vector3 joystick)
@@ -252,6 +307,13 @@ public class PlayerInputController : BaseTankController
 #if UNITY_EDITOR
     private void OnDrawGizmos()
     {
+        if (_boostPower > 0)
+        {
+            Vector3 boostPowerDebugLine = MovementTarget.position + Vector3.up * 0.5f;
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawLine(boostPowerDebugLine, boostPowerDebugLine + MovementTarget.forward * _boostPower);
+        }
+
         if (MovementTarget == null)
         {
             return;

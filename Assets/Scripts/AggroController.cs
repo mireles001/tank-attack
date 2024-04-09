@@ -21,6 +21,13 @@ public class AggroController : MonoBehaviour
             return _currentTarget;
         }
     }
+    public Vector3 AggroTargetPosition
+    {
+        get
+        {
+            return _currentTargetPosition;
+        }
+    }
 
     [SerializeField] private Transform _aggroCheckSource;
     [SerializeField] private Vector3 _aggroCheckOffset;
@@ -39,6 +46,7 @@ public class AggroController : MonoBehaviour
 
     private IDestructible[] _ignoreDestructibles;
     private Transform _currentTarget;
+    private Vector3 _currentTargetPosition;
     private LevelSettings _settings;
     private Coroutine _aggroCheckTic;
 
@@ -128,6 +136,8 @@ public class AggroController : MonoBehaviour
             {
                 newTarget = colliderTransform;
             }
+
+            _currentTargetPosition = collider.bounds.center;
         }
 
         if (skipUpdateTarget)
