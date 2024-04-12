@@ -1,8 +1,11 @@
 using UnityEngine;
 
-interface IInteractable
+namespace Shibidubi.TankAttack
 {
-    void StartInteractionHandler(Transform interactionSourceTransform);
-    void InteractionHandler(Transform interactionSourceTransform);
-    void StopInteractionHandler(Transform interactionSourceTransform);
+    interface IInteractable
+    {
+        void StartInteractionHandler(Transform interactionSourceTransform);
+        void InteractionHandler(Transform interactionSourceTransform);
+        void StopInteractionHandler(Transform interactionSourceTransform);
+    }
 }

@@ -3,11 +3,9 @@ using UnityEngine;
 namespace Shibidubi.TankAttack
 {
     [DisallowMultipleComponent]
-    public class BaseTankController : MonoBehaviour
+    public abstract class GameActorController : MonoBehaviour
     {
         [SerializeField] protected ActorHealthController _healthController;
-        [SerializeField] protected TankMovementController _movementController;
-        [SerializeField] protected TurretAttackController _attackController;
 
         protected bool _isAlive;
 
@@ -15,7 +13,7 @@ namespace Shibidubi.TankAttack
         {
             if (_healthController != null)
             {
-                _healthController.HealthDepleted -= OnTankDestroyed;
+                _healthController.HealthDepleted -= OnActorDestroyed;
             }
         }
 
@@ -28,11 +26,11 @@ namespace Shibidubi.TankAttack
         {
             if (_healthController != null)
             {
-                _healthController.HealthDepleted += OnTankDestroyed;
+                _healthController.HealthDepleted += OnActorDestroyed;
             }
         }
 
-        protected virtual void OnTankDestroyed()
+        protected virtual void OnActorDestroyed()
         {
             _isAlive = false;
         }

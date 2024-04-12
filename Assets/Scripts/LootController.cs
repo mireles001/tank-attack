@@ -1,22 +1,25 @@
 using UnityEngine;
 
-public class LootController : MonoBehaviour
+namespace Shibidubi.TankAttack
 {
-    [SerializeField] private GameObject _lootPrefab;
-    [SerializeField, Range(0, 1)] private float _dropProbability;
-    [Space, SerializeField] private Vector3 _spawnPositionOffset;
-
-    public void SpawnLoot()
+    public class LootController : MonoBehaviour
     {
-        if (_lootPrefab == null || _dropProbability == 0)
-        {
-            return;
-        }
+        [SerializeField] private GameObject _lootPrefab;
+        [SerializeField, Range(0, 1)] private float _dropProbability;
+        [Space, SerializeField] private Vector3 _spawnPositionOffset;
 
-        if (Random.Range(0f, 1f) <= _dropProbability)
+        public void SpawnLoot()
         {
-            Transform dropInstance = Instantiate(_lootPrefab).transform;
-            dropInstance.SetPositionAndRotation(transform.position + _spawnPositionOffset, transform.rotation);
+            if (_lootPrefab == null || _dropProbability == 0)
+            {
+                return;
+            }
+
+            if (Random.Range(0f, 1f) <= _dropProbability)
+            {
+                Transform dropInstance = Instantiate(_lootPrefab).transform;
+                dropInstance.SetPositionAndRotation(transform.position + _spawnPositionOffset, transform.rotation);
+            }
         }
     }
 }

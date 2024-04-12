@@ -1,53 +1,34 @@
 using UnityEngine;
 
-[DisallowMultipleComponent]
-public class TankMovementController : MonoBehaviour
+namespace Shibidubi.TankAttack
 {
-    public Transform MovementTarget
+    [DisallowMultipleComponent]
+    public class TankMovementController : MonoBehaviour
     {
-        get
+        public Transform MovementTarget
         {
-            return transform;
+            get
+            {
+                return transform;
+            }
         }
-    }
 
-    [Header("Movement and Rotation")]
-    [SerializeField] protected float _movementSpeed;
-    [SerializeField] protected float _rotationSpeed;
+        [Header("Movement and Rotation")]
+        [SerializeField] protected float _movementSpeed;
+        [SerializeField] protected float _rotationSpeed;
 
-    protected float _rotationSmoothVelocity;
+        protected float _rotationSmoothVelocity;
 
-    #region UNITY_EVENTS
+        public virtual void Move(float moveInput)
+        {
+            MovementTarget.position += MovementTarget.forward * moveInput * _movementSpeed;
+        }
 
-    public void OnTriggerEnter(Collider other)
-    {
-        var interactable = other.gameObject.GetComponent<IInteractable>();
-        interactable?.StartInteractionHandler(transform);
-    }
+        public void Rotate(float rotationAngle)
+        {
+            float smoothRotationAngle = Mathf.SmoothDampAngle(MovementTarget.eulerAngles.y, rotationAngle, ref _rotationSmoothVelocity, _rotationSpeed);
 
-    public void OnTriggerStay(Collider other)
-    {
-        var interactable = other.gameObject.GetComponent<IInteractable>();
-        interactable?.InteractionHandler(transform);
-    }
-
-    public void OnTriggerExit(Collider other)
-    {
-        var interactable = other.gameObject.GetComponent<IInteractable>();
-        interactable?.StopInteractionHandler(transform);
-    }
-
-    #endregion
-
-    public virtual void Move(float moveInput)
-    {
-        MovementTarget.position += MovementTarget.forward * moveInput * _movementSpeed;
-    }
-
-    public void Rotate(float rotationAngle)
-    {
-        float smoothRotationAngle = Mathf.SmoothDampAngle(MovementTarget.eulerAngles.y, rotationAngle, ref _rotationSmoothVelocity, _rotationSpeed);
-
-        MovementTarget.rotation = Quaternion.Euler(0, smoothRotationAngle, 0);
+            MovementTarget.rotation = Quaternion.Euler(0, smoothRotationAngle, 0);
+        }
     }
 }

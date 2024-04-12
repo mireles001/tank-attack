@@ -1,49 +1,52 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "LevelSettings", menuName = "TankAttack/LevelSettings")]
-public class LevelSettings : ScriptableObject
+namespace Shibidubi.TankAttack
 {
-    public string PlayerTag
+    [CreateAssetMenu(fileName = "LevelSettings", menuName = "TankAttack/LevelSettings")]
+    public class LevelSettings : ScriptableObject
     {
-        get
+        public string PlayerTag
         {
-            return _playerTag;
+            get
+            {
+                return _playerTag;
+            }
         }
-    }
-    public string EnemyTag
-    {
-        get
+        public string EnemyTag
         {
-            return _enemyTag;
+            get
+            {
+                return _enemyTag;
+            }
         }
-    }
-    public float StartWaitDuration
-    {
-        get
+        public float StartWaitDuration
         {
-            return _startWaitDuration;
+            get
+            {
+                return _startWaitDuration;
+            }
         }
-    }
-    public float EndWaitDuration
-    {
-        get
+        public float EndWaitDuration
         {
-            return _endWaitDuration;
+            get
+            {
+                return _endWaitDuration;
+            }
         }
-    }
-    public float RetryWaitDuration
-    {
-        get
+        public float RetryWaitDuration
         {
-            return _retryWaitDuration;
+            get
+            {
+                return _retryWaitDuration;
+            }
         }
-    }
 
-    [Header("Tags")]
-    [SerializeField] private string _playerTag = "Player";
-    [SerializeField] private string _enemyTag = "Enemy";
-    [Header("Timers")]
-    [SerializeField] private float _startWaitDuration;
-    [SerializeField] private float _endWaitDuration;
-    [SerializeField] private float _retryWaitDuration;
+        [Header("Tags")]
+        [SerializeField] private string _playerTag = "Player";
+        [SerializeField] private string _enemyTag = "Enemy";
+        [Header("Timers")]
+        [SerializeField] private float _startWaitDuration;
+        [SerializeField] private float _endWaitDuration;
+        [SerializeField] private float _retryWaitDuration;
+    }
 }

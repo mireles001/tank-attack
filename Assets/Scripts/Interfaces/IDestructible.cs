@@ -1,7 +1,10 @@
-public interface IDestructible
+namespace Shibidubi.TankAttack
 {
-    string GetObjectTag();
-    int GetHealth();
-    int GetMaxHealth();
-    void ApplyDamage(int damage, bool isInstaKill = false);
+    public interface IDestructible
+    {
+        string GetObjectTag();
+        int GetHealth();
+        int GetMaxHealth();
+        void ApplyDamage(int damage, bool isInstaKill = false);
+    }
 }
