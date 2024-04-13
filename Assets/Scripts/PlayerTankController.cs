@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Shibidubi.TankAttack
 {
-    public class PlayerInputController : BaseTankController
+    public class PlayerTankController : ActorController
     {
         public Transform MovementTarget
         {
@@ -20,7 +20,7 @@ namespace Shibidubi.TankAttack
         {
             get
             {
-                if (_forwardPointhDamp <= 0 || _forwardPointhDistance <= 0)
+                if (_forwardPointDamp <= 0 || _forwardPointDistance <= 0)
                 {
                     return MovementTarget.position;
                 }
@@ -29,9 +29,12 @@ namespace Shibidubi.TankAttack
             }
         }
 
+        [SerializeField] private TankMovementController _movementController;
+        [SerializeField] private TurretAttackController _attackController;
+        [Header("Camera focus")]
         [SerializeField] private Camera _camera;
-        [SerializeField] private float _forwardPointhDistance;
-        [SerializeField] private float _forwardPointhDamp;
+        [SerializeField] private float _forwardPointDistance;
+        [SerializeField] private float _forwardPointDamp;
         [Header("Speed Boost"), Tooltip("Move + (hold) Break to gain boost")]
         [SerializeField] private float _boostLimit;
         [SerializeField] private float _boostGainSpeed;
@@ -72,8 +75,8 @@ namespace Shibidubi.TankAttack
         Cursor.lockState = CursorLockMode.Confined;
 #endif
 
-            _forwardPointhDistance = Mathf.Max(0, _forwardPointhDistance);
-            _forwardPointhDamp = Mathf.Max(0, _forwardPointhDamp);
+            _forwardPointDistance = Mathf.Max(0, _forwardPointDistance);
+            _forwardPointDamp = Mathf.Max(0, _forwardPointDamp);
 
             _lookAtDirection = MovementTarget.forward * LOOK_AT_DISTANCE;
 
@@ -82,7 +85,7 @@ namespace Shibidubi.TankAttack
 
         private void Update()
         {
-            if (!_isAlive || (LevelManager.Instance != null && !LevelManager.Instance.ActiveGameplay))
+            if (DoNotUpdate())
             {
                 return;
             }
@@ -115,13 +118,13 @@ namespace Shibidubi.TankAttack
 
         public void OnTriggerEnter(Collider other)
         {
-            if (!_isAlive)
+            if (DoNotUpdate())
             {
                 return;
             }
 
             LevelExitController exit = other.gameObject.GetComponent<LevelExitController>();
-            if (LevelManager.Instance != null && LevelManager.Instance.ActiveGameplay && exit != null && !exit.IsLocked)
+            if (exit != null && !exit.IsLocked)
             {
                 LevelManager.Instance.End();
             }
@@ -187,12 +190,12 @@ namespace Shibidubi.TankAttack
 
         private void MoveForwardPointGoToPosition(Vector3 direction)
         {
-            if (_isCameraTargetFreezed || _forwardPointhDamp <= 0 || _forwardPointhDistance <= 0)
+            if (_isCameraTargetFreezed || _forwardPointDamp <= 0 || _forwardPointDistance <= 0)
             {
                 return;
             }
 
-            _forwardPoint = Vector3.SmoothDamp(_forwardPoint, MovementTarget.position + GetRelativeDirection(direction, _camera.transform) * _forwardPointhDistance, ref _forwardPointVelocity, _forwardPointhDamp);
+            _forwardPoint = Vector3.SmoothDamp(_forwardPoint, MovementTarget.position + GetRelativeDirection(direction, _camera.transform) * _forwardPointDistance, ref _forwardPointVelocity, _forwardPointDamp);
         }
 
         #endregion
@@ -293,9 +296,9 @@ namespace Shibidubi.TankAttack
             return direction.z * cameraForward + direction.x * cameraRight;
         }
 
-        protected override void OnTankDestroyed()
+        protected override void OnActorDestroyed()
         {
-            base.OnTankDestroyed();
+            base.OnActorDestroyed();
 
             // Disable camera-target position updates
             _isCameraTargetFreezed = true;

@@ -731,15 +731,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 8949582602054071991}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 68243b9cddbbe204692a991c895666a0, type: 3}
+  m_Script: {fileID: 11500000, guid: 24e84427a7a41a0489c3c027325ad113, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _healthController: {fileID: 3678944269568785357}
   _movementController: {fileID: 6670727283768244350}
   _attackController: {fileID: 5204333384996036154}
   _camera: {fileID: 0}
-  _forwardPointhDistance: 2.5
-  _forwardPointhDamp: 0.3
+  _forwardPointDistance: 2.5
+  _forwardPointDamp: 0.3
   _boostLimit: 1.25
   _boostGainSpeed: 2
   _boostLoseSpeed: 0.9

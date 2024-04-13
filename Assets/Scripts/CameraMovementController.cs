@@ -4,7 +4,7 @@ namespace Shibidubi.TankAttack
 {
     public class CameraMovementController : MonoBehaviour
     {
-        [SerializeField] private PlayerInputController _playerInput;
+        [SerializeField] private PlayerTankController _playerInput;
         [SerializeField] private Transform _cameraWrapper;
         [Header("Camera Rotation")]
         [SerializeField] private float _rotationSpeed = 1f;
