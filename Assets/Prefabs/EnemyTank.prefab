@@ -420,7 +420,7 @@ GameObject:
   - component: {fileID: 3141685104553976928}
   - component: {fileID: 4795787386397370882}
   - component: {fileID: 7490073106679356724}
-  - component: {fileID: 6446729972273109116}
+  - component: {fileID: 8420511693467460312}
   - component: {fileID: 2097366318522165104}
   - component: {fileID: 3753622688541638986}
   m_Layer: 0
@@ -511,20 +511,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _healthController: {fileID: 3141685104553976928}
-  _movementController: {fileID: 4795787386397370882}
-  _attackController: {fileID: 7490073106679356724}
-  _patrolingMaxDistance: 6
-  _patrolingIntervalRange: {x: 3, y: 6}
-  _forwardCheckDistance: 1
-  _forwardCheckOffset: {x: 0, y: 0.35, z: 0.25}
-  _forwardCheckAngleTolerance: 45
-  _aggroController: {fileID: 6446729972273109116}
+  _aggroController: {fileID: 8420511693467460312}
   _attackThrought: 0
-  _aggroMovementMultiplier: 1.75
-  _aggroGoToDistance: 2.5
   _resetAggroWaitTime: 3
   _aggroRangeMultiplier: 3
-  _aggroRangeDuration: 2
+  _aggroRangeDurationTime: 2
   _onDestroyEvents:
     m_PersistentCalls:
       m_Calls:
@@ -540,6 +531,15 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  _movementController: {fileID: 4795787386397370882}
+  _attackController: {fileID: 7490073106679356724}
+  _aggroMovementMultiplier: 1.75
+  _aggroGoToDistance: 2.5
+  _patrolingMaxDistance: 6
+  _patrolingIntervalRange: {x: 3, y: 6}
+  _forwardCheckDistance: 1
+  _forwardCheckOffset: {x: 0, y: 0.35, z: 0.25}
+  _forwardCheckAngleTolerance: 45
 --- !u!114 &3141685104553976928
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -590,7 +590,7 @@ MonoBehaviour:
   _rotateY: 1
   _turretTransform: {fileID: 7451350675746229427}
   _turretRotationSpeed: 3.75
---- !u!114 &6446729972273109116
+--- !u!114 &8420511693467460312
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -599,7 +599,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 8841803514492096116}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4596da0ba946db741ba09eb8755f988d, type: 3}
+  m_Script: {fileID: 11500000, guid: b7224a00aecc6c14aa72b72e71e1a6c9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _aggroCheckSource: {fileID: 8229688176202390051}

@@ -332,7 +332,7 @@ GameObject:
   - component: {fileID: 3022405203990151963}
   - component: {fileID: 5367435330726425365}
   - component: {fileID: 8533724668976303186}
-  - component: {fileID: 6641917212474038472}
+  - component: {fileID: 1030111783019114286}
   - component: {fileID: 3778294877897263471}
   m_Layer: 0
   m_Name: EnemyTurret
@@ -395,12 +395,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _healthController: {fileID: 5367435330726425365}
-  _attackController: {fileID: 8533724668976303186}
-  _aggroController: {fileID: 6641917212474038472}
+  _aggroController: {fileID: 1030111783019114286}
   _attackThrought: 1
   _resetAggroWaitTime: 3
   _aggroRangeMultiplier: 1.25
-  _aggroRangeDuration: 1
+  _aggroRangeDurationTime: 2
   _onDestroyEvents:
     m_PersistentCalls:
       m_Calls:
@@ -416,6 +415,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  _attackController: {fileID: 8533724668976303186}
 --- !u!114 &5367435330726425365
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -428,7 +428,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd998e8d9a511a14cb24741b715ebe85, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _maxHealth: 5
+  _maxHealth: 4
   _invincibilityDuration: 0.1
   _destroyedFx: {fileID: 0}
 --- !u!114 &8533724668976303186
@@ -452,7 +452,7 @@ MonoBehaviour:
   _rotateY: 1
   _turretTransform: {fileID: 5640165844787254802}
   _turretRotationSpeed: 4
---- !u!114 &6641917212474038472
+--- !u!114 &1030111783019114286
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -461,13 +461,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 8869195940579064185}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4596da0ba946db741ba09eb8755f988d, type: 3}
+  m_Script: {fileID: 11500000, guid: b7224a00aecc6c14aa72b72e71e1a6c9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _aggroCheckSource: {fileID: 7869129978534049677}
   _aggroCheckOffset: {x: 0, y: -0.55, z: 0}
   _aggroCheckRadius: 4.5
-  _lockOnTarget: 0
+  _lockOnTarget: 1
   _targetPlayer: 1
   _targetEnemies: 0
   _targetOthers: 0

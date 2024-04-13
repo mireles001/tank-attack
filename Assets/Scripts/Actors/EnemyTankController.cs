@@ -1,102 +1,41 @@
 using System.Collections;
 using UnityEngine;
-using UnityEngine.Events;
 
 namespace Shibidubi.TankAttack
 {
-    public class EnemyTankController : BaseTankController
+    public class EnemyTankController : EnemyController
     {
+        [Space, Space, SerializeField] private TankMovementController _movementController;
+        [Header("Attacking (Aggressive)")]
+        [SerializeField] private TurretAttackController _attackController;
+        [Tooltip("Multiply movement speed if has target")]
+        [SerializeField] private float _aggroMovementMultiplier = 1f; // 1 == Same movement speed
+        [Tooltip("Move up to this distance from target")]
+        [SerializeField] private float _aggroGoToDistance;
         [Header("Patroling (Non-aggressive)")]
         [SerializeField] private float _patrolingMaxDistance;
         [SerializeField] private Vector2 _patrolingIntervalRange;
         [SerializeField] private float _forwardCheckDistance;
         [SerializeField] private Vector3 _forwardCheckOffset;
         [SerializeField] private float _forwardCheckAngleTolerance;
-        [Header("Aggressive")]
-        [SerializeField] private AggroController _aggroController;
-        [Tooltip("Attack target even if there is not clear line of sight")]
-        [SerializeField] private bool _attackThrought;
-        [Tooltip("Multiply movement speed if has target")]
-        [SerializeField] private float _aggroMovementMultiplier = 1f; // 1 == Same movement speed
-        [Tooltip("Move up to this distance from target")]
-        [SerializeField] private float _aggroGoToDistance;
-        [SerializeField] private float _resetAggroWaitTime;
-        [Header("On Damage")]
-        [Tooltip("On damage aggro check radius will multiply by this")]
-        [SerializeField] private float _aggroRangeMultiplier = 1f; // 1 == Same check radius
-        [Tooltip("Duration of modified aggro check radius before going back to normal")]
-        [SerializeField] private float _aggroRangeDuration;
-        [Space, Header("Execute events OnTankDestroyed"), Space]
-        [SerializeField] private UnityEvent _onDestroyEvents;
 
         private readonly float MIN_DISTANCE_CHECK = 0.1f;
-        private readonly Vector3 LOS_BOXCAST_HALF_EXTENDS = new Vector3(0.3f, 0.25f, 0.25f);
+        private readonly Vector3 LOS_BOXCAST_HALF_EXTENDS = new(0.3f, 0.25f, 0.25f);
 
         private bool _isPatroling;
-        private bool _isTargetInSight;
-        private float _aggroCheckRadius;
         private Vector3 _goTo;
-        private Coroutine _onDamagedCoroutine;
-        private Coroutine _resetAggroCoroutine;
         private Coroutine _patrolingIntervalCoroutine;
-
-        #region LIFE_CYCLE
 
         protected override void OnDisable()
         {
             base.OnDisable();
 
-            KillOnDamagedWait();
             KillPatrolingInterval();
-            KillResetAggro();
-
-            if (LevelManager.Instance != null)
-            {
-                LevelManager.Instance.RemoveEnemy();
-                LevelManager.Instance.LevelStart -= OnLevelStart;
-                LevelManager.Instance.LevelEnd -= OnLevelEnd;
-                LevelManager.Instance.PlayerDefeat -= OnPlayerDefeat;
-            }
-
-            if (_healthController != null)
-            {
-                _healthController.HealthModified -= OnDamaged;
-            }
-        }
-
-        protected override void Start()
-        {
-            base.Start();
-
-            if (_healthController != null)
-            {
-                _healthController.HealthModified += OnDamaged;
-            }
-
-            if (_aggroController != null)
-            {
-                _aggroCheckRadius = _aggroController.AggroCheckRadius;
-            }
-
-            if (LevelManager.Instance == null)
-            {
-                return;
-            }
-
-            LevelManager.Instance.AddEnemy();
-            LevelManager.Instance.LevelStart += OnLevelStart;
-            LevelManager.Instance.LevelEnd += OnLevelEnd;
-            LevelManager.Instance.PlayerDefeat += OnPlayerDefeat;
-
-            if (LevelManager.Instance.ActiveGameplay)
-            {
-                _aggroController.SetIgnoreDestructible(new IDestructible[] { _healthController }).FirstAggroCheckTic();
-            }
         }
 
         private void Update()
         {
-            if (!_isAlive || (LevelManager.Instance != null && !LevelManager.Instance.ActiveGameplay))
+            if (DoNotUpdate() || _aggroController == null)
             {
                 return;
             }
@@ -106,41 +45,6 @@ namespace Shibidubi.TankAttack
             Attack();
             MoveTurret(Time.deltaTime);
         }
-
-        #endregion
-
-        protected override void OnTankDestroyed()
-        {
-            base.OnTankDestroyed();
-
-            _onDestroyEvents?.Invoke();
-            Destroy(gameObject);
-        }
-
-        private void OnLevelStart()
-        {
-            _aggroController.SetIgnoreDestructible(new IDestructible[] { _healthController }).FirstAggroCheckTic();
-        }
-
-        private void OnLevelEnd()
-        {
-            OnTankDestroyed();
-        }
-
-        private void OnDamaged()
-        {
-            if (_aggroController == null || _aggroRangeDuration <= 0)
-            {
-                return;
-            }
-
-            _aggroController.SetAggroCheckRadius(_aggroCheckRadius * _aggroRangeMultiplier).AggroCheckTic();
-
-            _onDamagedCoroutine = StartCoroutine(OnDamagedWait());
-
-        }
-
-        private void OnPlayerDefeat() { }
 
         private void MoveTank(float timeDelta)
         {
@@ -245,25 +149,6 @@ namespace Shibidubi.TankAttack
             _attackController.RotateTurret(lookAtDirection, deltaTime);
         }
 
-        private IEnumerator OnDamagedWait()
-        {
-            yield return new WaitForSeconds(_aggroRangeDuration);
-
-            _aggroController.SetAggroCheckRadius(_aggroCheckRadius);
-            KillOnDamagedWait();
-        }
-
-        private void KillOnDamagedWait()
-        {
-            if (_onDamagedCoroutine == null)
-            {
-                return;
-            }
-
-            StopCoroutine(_onDamagedCoroutine);
-            _onDamagedCoroutine = null;
-        }
-
         private IEnumerator PatrolingInterval()
         {
             _isPatroling = true;
@@ -282,59 +167,6 @@ namespace Shibidubi.TankAttack
 
             StopCoroutine(_patrolingIntervalCoroutine);
             _patrolingIntervalCoroutine = null;
-        }
-
-        private IEnumerator ResetAggro()
-        {
-            yield return new WaitForSeconds(_resetAggroWaitTime);
-            KillResetAggro();
-        }
-
-        private void KillResetAggro()
-        {
-            if (_resetAggroCoroutine == null)
-            {
-                return;
-            }
-
-            StopCoroutine(_resetAggroCoroutine);
-            _resetAggroCoroutine = null;
-        }
-
-        private static bool CheckLineOfSight(Transform source, Transform target, Vector3 halfExtents, bool attackThrought)
-        {
-            bool result = false;
-            if (target == null)
-            {
-                return result;
-            }
-
-            float targetDistance = Vector3.Distance(source.position, target.position);
-            if (attackThrought)
-            {
-                RaycastHit[] hits = Physics.BoxCastAll(source.position, halfExtents, source.forward, source.rotation, targetDistance);
-
-                foreach (RaycastHit hit in hits)
-                {
-                    if (hit.collider.gameObject.transform == target)
-                    {
-                        result = true;
-                        break;
-                    }
-                }
-            }
-            else
-            {
-                if (Physics.BoxCast(source.position, halfExtents, source.forward, out RaycastHit hit, source.rotation, targetDistance))
-                {
-                    if (hit.collider.gameObject.transform == target)
-                    {
-                        result = true;
-                    }
-                }
-            }
-
-            return result;
         }
 
         private static Vector3 GetForwardCheckOrigin(Transform origin, Vector3 offset)

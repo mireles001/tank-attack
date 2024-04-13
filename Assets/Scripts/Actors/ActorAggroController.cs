@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Shibidubi.TankAttack
 {
-    public class AggroController : MonoBehaviour
+    public class ActorAggroController : MonoBehaviour
     {
         public float AggroCheckRadius
         {
@@ -59,13 +59,13 @@ namespace Shibidubi.TankAttack
 
         #region PUBLIC_FUNCTIONS
 
-        public AggroController SetIgnoreDestructible(IDestructible[] ignoreDestructibles)
+        public ActorAggroController SetIgnoreDestructible(IDestructible[] ignoreDestructibles)
         {
             _ignoreDestructibles = ignoreDestructibles;
             return this;
         }
 
-        public AggroController SetAggroCheckRadius(float aggroCheckRadius)
+        public ActorAggroController SetAggroCheckRadius(float aggroCheckRadius)
         {
             _aggroCheckRadius = aggroCheckRadius;
             return this;

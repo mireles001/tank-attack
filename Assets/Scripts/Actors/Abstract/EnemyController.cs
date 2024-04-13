@@ -4,36 +4,32 @@ using UnityEngine.Events;
 
 namespace Shibidubi.TankAttack
 {
-    public class EnemyTurretController : MonoBehaviour
+    public abstract class EnemyController : ActorController
     {
-        [SerializeField] private ActorHealthController _healthController;
-        [SerializeField] protected TurretAttackController _attackController;
-        [Header("Aggressive")]
-        [SerializeField] private AggroController _aggroController;
+        [Header("Aggro")]
+        [SerializeField] protected ActorAggroController _aggroController;
         [Tooltip("Attack target even if there is not clear line of sight")]
-        [SerializeField] private bool _attackThrought;
+        [SerializeField] protected bool _attackThrought;
         [SerializeField] private float _resetAggroWaitTime;
-        [Header("On Damage")]
+        [Header("OnDamage")]
         [Tooltip("On damage aggro check radius will multiply by this")]
         [SerializeField] private float _aggroRangeMultiplier = 1f; // 1 == Same check radius
         [Tooltip("Duration of modified aggro check radius before going back to normal")]
-        [SerializeField] private float _aggroRangeDuration;
-        [Space, Header("Execute events OnTankDestroyed"), Space]
+        [SerializeField] private float _aggroRangeDurationTime; 
+        [Space, Header("OnDestroyed"), Space]
         [SerializeField] private UnityEvent _onDestroyEvents;
 
-        private readonly Vector3 LOS_BOXCAST_HALF_EXTENDS = new Vector3(0.3f, 0.25f, 0.25f);
-
-        private bool _isAlive;
-        private bool _isTargetInSight;
         private float _aggroCheckRadius;
-        private Coroutine _onDamagedCoroutine;
-        private Coroutine _resetAggroCoroutine;
+        private Coroutine _onDamageCoroutine;
 
-        #region LIFE_CYCLE
+        protected bool _isTargetInSight;
+        protected Coroutine _resetAggroCoroutine;
 
-        private void OnDisable()
+        protected override void OnDisable()
         {
-            KillOnDamagedWait();
+            base.OnDisable();
+
+            KillOnDamageWait();
             KillResetAggro();
 
             if (LevelManager.Instance != null)
@@ -43,23 +39,11 @@ namespace Shibidubi.TankAttack
                 LevelManager.Instance.LevelEnd -= OnLevelEnd;
                 LevelManager.Instance.PlayerDefeat -= OnPlayerDefeat;
             }
-
-            if (_healthController != null)
-            {
-                _healthController.HealthModified -= OnDamaged;
-                _healthController.HealthDepleted -= OnTurretDestroyed;
-            }
         }
 
-        private void Start()
+        protected override void Start()
         {
-            _isAlive = true;
-
-            if (_healthController != null)
-            {
-                _healthController.HealthModified += OnDamaged;
-                _healthController.HealthDepleted += OnTurretDestroyed;
-            }
+            base.Start();
 
             if (_aggroController != null)
             {
@@ -78,103 +62,73 @@ namespace Shibidubi.TankAttack
 
             if (LevelManager.Instance.ActiveGameplay)
             {
-                _aggroController.SetIgnoreDestructible(new IDestructible[] { _healthController }).FirstAggroCheckTic();
+                OnLevelStart();
             }
         }
 
-        private void Update()
+        private void OnLevelStart()
         {
-            if (!_isAlive || (LevelManager.Instance != null && !LevelManager.Instance.ActiveGameplay))
+            if (_aggroController == null)
             {
                 return;
             }
 
-            _isTargetInSight = CheckLineOfSight(_attackController.TurretTransform, _aggroController.AggroTarget, LOS_BOXCAST_HALF_EXTENDS, _attackThrought);
-            Attack();
-            MoveTurret(Time.deltaTime);
-        }
-
-        #endregion
-
-        private void OnLevelStart()
-        {
             _aggroController.SetIgnoreDestructible(new IDestructible[] { _healthController }).FirstAggroCheckTic();
         }
 
         private void OnLevelEnd()
         {
-            OnTurretDestroyed();
+            OnActorDestroyed();
         }
 
-        private void OnDamaged()
+        protected virtual void OnPlayerDefeat() { }
+
+        protected override void OnActorDamaged()
         {
-            if (_aggroController == null || _aggroRangeDuration <= 0)
+            if (_aggroController == null || _aggroRangeDurationTime <= 0)
             {
                 return;
             }
 
             _aggroController.SetAggroCheckRadius(_aggroCheckRadius * _aggroRangeMultiplier).AggroCheckTic();
 
-            _onDamagedCoroutine = StartCoroutine(OnDamagedWait());
-
+            _onDamageCoroutine = StartCoroutine(OnDamageWait());
         }
 
-        private void OnPlayerDefeat() { }
-
-        private void OnTurretDestroyed()
+        protected override void OnActorDestroyed()
         {
-            _isAlive = false;
+            base.OnActorDestroyed();
+
             _onDestroyEvents?.Invoke();
             Destroy(gameObject);
         }
 
-        private void Attack()
+        private IEnumerator OnDamageWait()
         {
-            if (!_isTargetInSight || _attackController.OnCoolDown)
-            {
-                return;
-            }
-
-            _attackController.Attack();
-        }
-
-        private void MoveTurret(float deltaTime)
-        {
-            if (_aggroController.AggroTarget == null)
-            {
-                return;
-            }
-
-            Vector3 lookAtDirection = _aggroController.AggroTargetPosition - _attackController.TurretTransform.position;
-            _attackController.RotateTurret(lookAtDirection, deltaTime);
-        }
-
-        private IEnumerator OnDamagedWait()
-        {
-            yield return new WaitForSeconds(_aggroRangeDuration);
+            yield return new WaitForSeconds(_aggroRangeDurationTime);
 
             _aggroController.SetAggroCheckRadius(_aggroCheckRadius);
-            KillOnDamagedWait();
+            KillOnDamageWait();
         }
 
-        private void KillOnDamagedWait()
+        private void KillOnDamageWait()
         {
-            if (_onDamagedCoroutine == null)
+            if (_onDamageCoroutine == null)
             {
                 return;
             }
 
-            StopCoroutine(_onDamagedCoroutine);
-            _onDamagedCoroutine = null;
+            StopCoroutine(_onDamageCoroutine);
+            _onDamageCoroutine = null;
         }
 
-        private IEnumerator ResetAggro()
+        protected IEnumerator ResetAggro()
         {
             yield return new WaitForSeconds(_resetAggroWaitTime);
             KillResetAggro();
         }
 
-        private void KillResetAggro()
+        protected void KillResetAggro()
         {
             if (_resetAggroCoroutine == null)
             {
@@ -185,7 +139,7 @@ namespace Shibidubi.TankAttack
             _resetAggroCoroutine = null;
         }
 
-        private static bool CheckLineOfSight(Transform source, Transform target, Vector3 halfExtents, bool attackThrought)
+        protected static bool CheckLineOfSight(Transform source, Transform target, Vector3 halfExtents, bool attackThrought)
         {
             bool result = false;
             if (target == null)
