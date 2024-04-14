@@ -397,8 +397,8 @@ MonoBehaviour:
   _healthController: {fileID: 5367435330726425365}
   _aggroController: {fileID: 1030111783019114286}
   _attackThrought: 1
-  _resetAggroWaitTime: 3
-  _aggroRangeMultiplier: 1.25
+  _resetAggroWaitTime: 5
+  _aggroRangeMultiplier: 1.75
   _aggroRangeDurationTime: 2
   _onDestroyEvents:
     m_PersistentCalls:
@@ -416,6 +416,7 @@ MonoBehaviour:
           m_BoolArgument: 0
         m_CallState: 2
   _attackController: {fileID: 8533724668976303186}
+  _turretPassiveMovementSpeed: 50
 --- !u!114 &5367435330726425365
 MonoBehaviour:
   m_ObjectHideFlags: 0

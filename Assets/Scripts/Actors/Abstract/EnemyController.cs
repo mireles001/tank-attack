@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
+using DG.Tweening;
 
 namespace Shibidubi.TankAttack
 {
@@ -15,11 +16,14 @@ namespace Shibidubi.TankAttack
         [Tooltip("On damage aggro check radius will multiply by this")]
         [SerializeField] private float _aggroRangeMultiplier = 1f; // 1 == Same check radius
         [Tooltip("Duration of modified aggro check radius before going back to normal")]
-        [SerializeField] private float _aggroRangeDurationTime; 
+        [SerializeField] private float _aggroRangeDurationTime;
         [Space, Header("OnDestroyed"), Space]
         [SerializeField] private UnityEvent _onDestroyEvents;
 
+        private readonly float DESTROY_TWEEN_DURATION = 0.2f;
+
         private float _aggroCheckRadius;
+        private Collider[] _enemyColliders;
         private Coroutine _onDamageCoroutine;
 
         protected bool _isTargetInSight;
@@ -30,7 +34,7 @@ namespace Shibidubi.TankAttack
             base.OnDisable();
 
             KillOnDamageWait();
-            KillResetAggro();
+            KillAggroReset();
 
             if (LevelManager.Instance != null)
             {
@@ -44,6 +48,8 @@ namespace Shibidubi.TankAttack
         protected override void Start()
         {
             base.Start();
+
+            _enemyColliders = gameObject.GetComponents<Collider>();
 
             if (_aggroController != null)
             {
@@ -100,7 +106,16 @@ namespace Shibidubi.TankAttack
             base.OnActorDestroyed();
 
             _onDestroyEvents?.Invoke();
-            Destroy(gameObject);
+
+            if (_enemyColliders != null)
+            {
+                foreach (Collider collider in _enemyColliders)
+                {
+                    collider.enabled = false;
+                }
+            }
+
+            transform.DOScale(Vector3.zero, DESTROY_TWEEN_DURATION).SetEase(Ease.InBack).OnComplete(() => { Destroy(gameObject); });
         }
 
         private IEnumerator OnDamageWait()
@@ -122,13 +137,13 @@ namespace Shibidubi.TankAttack
             _onDamageCoroutine = null;
         }
 
-        protected IEnumerator ResetAggro()
+        protected IEnumerator BeginAggroReset()
         {
             yield return new WaitForSeconds(_resetAggroWaitTime);
-            KillResetAggro();
+            KillAggroReset();
         }
 
-        protected void KillResetAggro()
+        protected void KillAggroReset()
         {
             if (_resetAggroCoroutine == null)
             {

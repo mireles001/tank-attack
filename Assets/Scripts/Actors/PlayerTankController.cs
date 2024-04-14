@@ -1,4 +1,5 @@
 using UnityEngine;
+using DG.Tweening;
 
 namespace Shibidubi.TankAttack
 {
@@ -54,6 +55,7 @@ namespace Shibidubi.TankAttack
         private const float MOUSE_LOOK_DEATHZONE = 0.9f;
         private const float USE_FX_MULTIPLIER = 0.666f;
         private const float CAN_USE_FX_AGAIN_MULTIPLIER = 0.333f;
+        private readonly float DESTROY_TWEEN_DURATION = 0.2f;
 
         private bool _isUsingJoystick;
         private bool _isCameraTargetFreezed;
@@ -307,6 +309,8 @@ namespace Shibidubi.TankAttack
             {
                 LevelManager.Instance.Defeat();
             }
+
+            transform.DOScale(Vector3.zero, DESTROY_TWEEN_DURATION).SetEase(Ease.InBack);
         }
 
 #if UNITY_EDITOR

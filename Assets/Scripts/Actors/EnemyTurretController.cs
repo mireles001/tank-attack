@@ -5,8 +5,9 @@ namespace Shibidubi.TankAttack
     public class EnemyTurretController : EnemyController
     {
         [SerializeField] private TurretAttackController _attackController;
+        [SerializeField] private float _turretPassiveMovementSpeed;
 
-        private readonly Vector3 LOS_BOXCAST_HALF_EXTENDS = new(0.25f, 0.25f, 0.25f);
+        private readonly Vector3 LOS_BOXCAST_HALF_EXTENDS = new(0.2f, 0.25f, 0.25f);
 
         private void Update()
         {
@@ -28,17 +29,26 @@ namespace Shibidubi.TankAttack
             }
 
             _attackController.Attack();
+
+            KillAggroReset();
+            _resetAggroCoroutine = StartCoroutine(BeginAggroReset());
         }
 
         private void MoveTurret(float deltaTime)
         {
             if (_aggroController.AggroTarget == null)
             {
-                return;
+                if (_resetAggroCoroutine == null && _turretPassiveMovementSpeed != 0)
+                {
+                    // TODO: Use RotateTurret method to move the turrent, not this workaround
+                    _attackController.TurretTransform.RotateAround(_attackController.TurretTransform.position, Vector3.up, _turretPassiveMovementSpeed * Time.deltaTime);
+                }
             }
-
-            Vector3 lookAtDirection = _aggroController.AggroTargetPosition - _attackController.TurretTransform.position;
-            _attackController.RotateTurret(lookAtDirection, deltaTime);
+            else
+            {
+                Vector3 lookAtDirection = _aggroController.AggroTargetPosition - _attackController.TurretTransform.position;
+                _attackController.RotateTurret(lookAtDirection, deltaTime);
+            }
         }
     }
 }

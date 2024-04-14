@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.Events;
+using DG.Tweening;
 
 namespace Shibidubi.TankAttack
 {
@@ -9,6 +10,8 @@ namespace Shibidubi.TankAttack
         [SerializeField] private ParticleSystem _destroyFx;
         [Space, Header("Execute events on destroy"), Space]
         [SerializeField] private UnityEvent _onDestroyEvents;
+
+        private readonly float DESTROY_TWEEN_DURATION = 0.2f;
 
         private int _currentHitPoints;
 
@@ -26,7 +29,7 @@ namespace Shibidubi.TankAttack
             }
 
             _onDestroyEvents?.Invoke();
-            Destroy(gameObject);
+            transform.DOScale(Vector3.zero, DESTROY_TWEEN_DURATION).SetEase(Ease.InBack).OnComplete(() => { Destroy(gameObject); });
         }
 
         #region IDESTRUCTIBLE_INTERFACE

@@ -127,6 +127,8 @@ namespace Shibidubi.TankAttack
                     continue;
                 }
 
+                _currentTargetPosition = collider.bounds.center;
+
                 Transform colliderTransform = collider.gameObject.transform;
                 if (_lockOnTarget && colliderTransform == _currentTarget)
                 {
@@ -142,8 +144,6 @@ namespace Shibidubi.TankAttack
                 {
                     newTarget = colliderTransform;
                 }
-
-                _currentTargetPosition = collider.bounds.center;
             }
 
             if (skipUpdateTarget)

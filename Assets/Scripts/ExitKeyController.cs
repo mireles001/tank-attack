@@ -1,4 +1,5 @@
 using UnityEngine;
+using DG.Tweening;
 
 namespace Shibidubi.TankAttack
 {
@@ -6,6 +7,8 @@ namespace Shibidubi.TankAttack
     {
         [SerializeField] private Collider _keyItemCollider;
         [SerializeField] private ParticleSystem _pickUpFx;
+
+        private readonly float DESTROY_TWEEN_DURATION = 0.2f;
 
         private LevelSettings _settings;
 
@@ -70,7 +73,8 @@ namespace Shibidubi.TankAttack
             }
 
             LevelManager.Instance.PickUpKey();
-            Destroy(gameObject);
+            _keyItemCollider.enabled = false;
+            transform.DOScale(Vector3.zero, DESTROY_TWEEN_DURATION).SetEase(Ease.InBack).OnComplete(() => { Destroy(gameObject); });
         }
     }
 }

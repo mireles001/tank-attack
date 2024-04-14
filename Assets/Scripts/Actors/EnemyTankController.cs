@@ -20,7 +20,7 @@ namespace Shibidubi.TankAttack
         [SerializeField] private float _forwardCheckAngleTolerance;
 
         private readonly float MIN_DISTANCE_CHECK = 0.1f;
-        private readonly Vector3 LOS_BOXCAST_HALF_EXTENDS = new(0.3f, 0.25f, 0.25f);
+        private readonly Vector3 LOS_BOXCAST_HALF_EXTENDS = new(0.25f, 0.25f, 0.25f);
 
         private bool _isPatroling;
         private Vector3 _goTo;
@@ -122,8 +122,8 @@ namespace Shibidubi.TankAttack
                 updatePosition = true;
             }
 
-            KillResetAggro();
-            _resetAggroCoroutine = StartCoroutine(ResetAggro());
+            KillAggroReset();
+            _resetAggroCoroutine = StartCoroutine(BeginAggroReset());
 
             return updatePosition;
         }
